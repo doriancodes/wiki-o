@@ -12,10 +12,7 @@ fn create_dirs(notes_dir: &String, config_dir: &String) {
 }
 
 fn set_config() {
-    let config_path = format!(
-        "{}/.config/wiki-o",
-        home::home_dir().unwrap().display()
-    );
+    let config_path = format!("{}/.config/wiki-o", home::home_dir().unwrap().display());
     if fs::metadata(&config_path).is_err() {
         fs::create_dir_all(&config_path).unwrap();
         let config_file = format!("{}/config.toml", config_path);
@@ -34,11 +31,11 @@ fn set_config() {
 }
 
 fn get_config() -> Config {
-    let _config = fs::read_to_string(
-      format!(
-         "{}/.config/wiki-o/config.toml",
-         home::home_dir().unwrap().display()
-     )).expect("Unable to read file");
+    let _config = fs::read_to_string(format!(
+        "{}/.config/wiki-o/config.toml",
+        home::home_dir().unwrap().display()
+    ))
+    .expect("Unable to read file");
     return toml::from_str(&_config).unwrap();
 }
 

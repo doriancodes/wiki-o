@@ -3,7 +3,10 @@ use std::{error::Error, fs::OpenOptions, io::Seek};
 use serde_derive::{Deserialize, Serialize};
 use uuid::Uuid;
 
-pub fn write_to_csv(file_name: String, config_dir: String) -> Result<(), Box<dyn Error>> {
+use crate::config::InitialConfig;
+
+pub fn write_to_csv(file_name: &String, file_path: String, config: InitialConfig) -> Result<(), Box<dyn Error>> {
+    let config_dir = config.config_abs_dir;
     let mut file = OpenOptions::new()
         .write(true)
         .read(true)
@@ -18,9 +21,12 @@ pub fn write_to_csv(file_name: String, config_dir: String) -> Result<(), Box<dyn
         .from_writer(file);
 
     let uuid = Uuid::new_v4().to_string();
+    let date_added = chrono::Utc::now().format("%Y-%m-%d %H:%M:%S").to_string();
     wtr.serialize([MetadataRow {
         id: uuid,
         file_name: file_name.clone(),
+        file_path: file_path.clone(),
+        date_added: date_added,
     }])?;
 
     wtr.flush()?;
@@ -31,4 +37,6 @@ pub fn write_to_csv(file_name: String, config_dir: String) -> Result<(), Box<dyn
 struct MetadataRow {
     id: String,
     file_name: String,
+    file_path: String,
+    date_added: String,
 }

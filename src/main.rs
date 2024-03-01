@@ -11,7 +11,7 @@ fn main() {
         Some(("add", sub_matches)) => {
             action::add(sub_matches, config);
         }
-        Some(("list", _)) => {
+        Some(("list", sub_matches)) => {
             action::list(config);
         }
         Some(("delete", _)) => action::delete(config),

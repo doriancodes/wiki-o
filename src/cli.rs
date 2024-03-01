@@ -11,16 +11,25 @@ pub fn cli() -> Command {
                 .arg(arg!(<NOTE> "The note to write"))
                 .arg_required_else_help(true)
                 .arg(
-                    Arg::new("file")
+                    Arg::new("FILE")
                         .short('f')
                         .long("file")
                         .value_name("FILE")
                         .help("The file name")
-                        .default_missing_value("file.txt")
-                        .require_equals(false),
+                        .default_missing_value("default")
+                        .require_equals(true),
                 ),
         )
-        .subcommand(Command::new("list").about("List all notes"))
+        .subcommand(
+            Command::new("list").about("List all notes").arg(
+                Arg::new("short")
+                    .short('s')
+                    .long("short")
+                    .help("List all notes file names")
+                    .default_missing_value("false")
+                    .require_equals(false),
+            ),
+        )
         .subcommand(
             Command::new("delete").about("Purge all notes").arg(
                 Arg::new("all")

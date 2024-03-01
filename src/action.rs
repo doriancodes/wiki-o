@@ -13,15 +13,19 @@ pub fn init() -> InitialConfig {
 }
 
 pub fn add(sub_matches: &clap::ArgMatches, config: config::InitialConfig) {
-    let notes_dir: String = config.notes_abs_dir;
+    let notes_dir: &String = &config.notes_abs_dir;
 
     let content = sub_matches.get_one::<String>("NOTE").expect("required");
-    let content_f = format!("{}\n", content);
-    let file_name = sub_matches.get_one::<String>("file").expect("required");
+    let content_f = format!("{}\n\n", content);
+
+    let file_name = match sub_matches.get_one::<String>("FILE") {
+        Some(file_name) => file_name.clone(),
+        _ => "my_notes".to_string(),
+    };
 
     let file_path = format!("{}/{}.{}", notes_dir, file_name, config.file_format);
-    println!("File path: {}", file_path);
-    csv::write_to_csv(file_path.clone(), config.config_abs_dir).unwrap();
+
+    csv::write_to_csv(&file_name, file_path.clone(), config).unwrap();
 
     let mut note = OpenOptions::new()
         .write(true)

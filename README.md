@@ -69,6 +69,7 @@ Deleted all notes
 By default the config file is located under `~/.config/wiki-o`.
 
 ```toml
+# config.toml
 [directories]
 notes = "wiki-o/.notes"
 config = "wiki-o/.config"

@@ -16,18 +16,15 @@ pub fn cli() -> Command {
                         .long("file")
                         .value_name("FILE")
                         .help("The file name")
-                        .default_missing_value("default")
-                        .require_equals(true),
                 ),
         )
         .subcommand(
             Command::new("list").about("List all notes").arg(
-                Arg::new("short")
+                Arg::new("SHORT")
                     .short('s')
                     .long("short")
                     .help("List all notes file names")
-                    .default_missing_value("false")
-                    .require_equals(false),
+                    .require_equals(false)
             ),
         )
         .subcommand(

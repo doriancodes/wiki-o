@@ -37,10 +37,10 @@ pub fn add(sub_matches: &clap::ArgMatches, config: config::InitialConfig) {
     note.seek(SeekFrom::Start(0)).unwrap();
     note.write_all(content_f.as_bytes()).unwrap();
 
-    println!("Adding {} to {}", content, file_name);
+    println!("Added {} to {}", content, file_name);
 }
 
-pub fn list(config: config::InitialConfig) {
+pub fn list(sub_matches: &clap::ArgMatches, config: config::InitialConfig) {
     let notes_dir: String = config.notes_abs_dir;
 
     let paths = fs::read_dir(&notes_dir).unwrap();
@@ -48,8 +48,18 @@ pub fn list(config: config::InitialConfig) {
     for path in paths {
         let path_i = path.unwrap().path().display().to_string();
         println!("File: {}", path_i);
-        let content = fs::read_to_string(path_i).expect("unable to read file");
-        print!("\n{}\n", content);
+        match sub_matches.get_one::<String>("SHORT") {
+            Some(flag)  => {
+                if flag == "short" {
+                    continue;
+                }
+            }
+            _ => {
+                let content = fs::read_to_string(path_i).expect("unable to read file");
+                print!("\n{}\n", content);
+            },
+        }
+
     }
 }
 

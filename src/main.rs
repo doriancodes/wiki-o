@@ -12,7 +12,7 @@ fn main() {
             action::add(sub_matches, config);
         }
         Some(("list", sub_matches)) => {
-            action::list(config);
+            action::list(sub_matches, config);
         }
         Some(("delete", _)) => action::delete(config),
         Some(("init", _)) => {

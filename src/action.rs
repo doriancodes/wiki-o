@@ -164,6 +164,8 @@ mod tests {
             files[0].file,
             format!("{}/{}.{}", &notes_dir, &file_name, &file_format)
         );
+
+        teardown();
     }
 
     #[test]
@@ -174,6 +176,8 @@ mod tests {
         delete(&notes_dir, &config_dir);
 
         let result = delete(&notes_dir, &config_dir);
+
+        teardown();
 
         // let expected: Err = Err(std::io::Error::from(std::io::ErrorKind::NotFound));
 

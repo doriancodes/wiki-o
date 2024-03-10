@@ -1,3 +1,7 @@
+![test](https://github.com/doriancodes/wiki-o/actions/workflows/test.yml/badge.svg)
+[![License](https://img.shields.io/badge/License-GNU_General_Public_License_v3.0-green)](#license)
+
+
 # wiki-o
 
 Smart note taking cli app
@@ -78,10 +82,14 @@ config = "wiki-o/.config"
 format = "md"
 ```
 
-### Development
+## Development
 
 For now run all tests in the same thread:
 
 ```console
 RUST_TEST_THREADS=1 cargo test
 ```
+
+## License
+
+Released under [GNU General Public License v3.0](/LICENSE) by [@doriancodes](https://github.com/doriancodes).

@@ -1,7 +1,6 @@
 ![test](https://github.com/doriancodes/wiki-o/actions/workflows/test.yml/badge.svg)
 [![License](https://img.shields.io/badge/License-GNU_General_Public_License_v3.0-green)](#license)
 
-
 # wiki-o
 
 Smart note taking cli app
@@ -19,19 +18,25 @@ Usage: wiki-o [COMMAND]
 Commands:
   add     Add note
   list    List all notes
-  delete  Purge all notes
-  init    Initialize wiki-o configuration
+  delete  Delete all notes
+  config  Show wiki-o configuration
   help    Print this message or the help of the given subcommand(s)
 
 Options:
-  -h, --help  Print hel
+  -h, --help  Print help
 ```
 
-### Initialize configuration
+### Show configuration
 
 ```console
 $ wiki-o init
-Config initialized
+Current configuration:
+
+InitialConfig {
+    notes_abs_dir: "<home_dir>/wiki-o/.notes",
+    config_abs_dir: "<home_dir>/wiki-o/.config",
+    file_format: "md",
+}
 ```
 
 ### Add note
@@ -65,7 +70,8 @@ File: <home_dir>/wiki-o/.notes/my_notes.md
 
 ```console
 $ wiki-o delete
-Deleted all notes
+Deleted directory: <home_dir>/wiki-o/.notes
+Deleted directory: <home_dir>/wiki-o/.config
 ```
 
 ### Configuration

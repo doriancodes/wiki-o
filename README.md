@@ -77,3 +77,11 @@ config = "wiki-o/.config"
 [editor]
 format = "md"
 ```
+
+### Development
+
+For now run all tests in the same thread:
+
+```console
+RUST_TEST_THREADS=1 cargo test
+```

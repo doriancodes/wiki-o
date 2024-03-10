@@ -3,10 +3,11 @@ use std::{error::Error, fs::OpenOptions, io::Seek};
 use serde_derive::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::config::InitialConfig;
-
-pub fn write_to_csv(file_name: &String, file_path: String, config: InitialConfig) -> Result<(), Box<dyn Error>> {
-    let config_dir = config.config_abs_dir;
+pub fn write_to_csv(
+    file_name: &String,
+    file_path: String,
+    config_dir: &String,
+) -> Result<(), Box<dyn Error>> {
     let mut file = OpenOptions::new()
         .write(true)
         .read(true)

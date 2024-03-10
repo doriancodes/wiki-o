@@ -1,6 +1,6 @@
-use std::fs;
-
 use serde_derive::{Deserialize, Serialize};
+use std::env;
+use std::fs;
 
 fn create_dirs(notes_dir: &String, config_dir: &String) {
     if fs::metadata(&notes_dir).is_err() {
@@ -39,10 +39,9 @@ fn get_config() -> Config {
     return toml::from_str(&_config).unwrap();
 }
 
+#[derive(Debug, Deserialize, Serialize)]
 pub struct InitialConfig {
-    pub notes_dir: String,
     pub notes_abs_dir: String,
-    pub config_dir: String,
     pub config_abs_dir: String,
     pub file_format: String,
 }
@@ -51,19 +50,39 @@ impl InitialConfig {
     pub fn init() -> InitialConfig {
         set_config();
         let config = get_config();
-        let notes_dir = config.directories.notes;
-        let notes_abs_dir = format!("{}/{}", home::home_dir().unwrap().display(), notes_dir);
-        let config_dir = config.directories.config;
-        let config_abs_dir = format!("{}/{}", home::home_dir().unwrap().display(), config_dir);
+        let notes_abs_dir = format!(
+            "{}/{}",
+            home::home_dir().unwrap().display(),
+            config.directories.notes
+        );
+        let config_abs_dir = format!(
+            "{}/{}",
+            home::home_dir().unwrap().display(),
+            config.directories.config
+        );
         let file_format = config.editor.format;
 
         create_dirs(&notes_abs_dir, &config_abs_dir);
         return InitialConfig {
-            notes_dir,
             notes_abs_dir,
-            config_dir,
             config_abs_dir,
             file_format,
+        };
+    }
+}
+
+#[cfg(test)]
+impl Default for InitialConfig {
+    fn default() -> Self {
+        let current_dir = env::current_dir().unwrap();
+        let notes_abs_dir = format!("{}/test-dir/notes", current_dir.display());
+        let config_abs_dir = format!("{}/test-dir/config", current_dir.display());
+        let file_format = "md".to_string();
+
+        return InitialConfig {
+            notes_abs_dir: notes_abs_dir,
+            config_abs_dir: config_abs_dir,
+            file_format: file_format,
         };
     }
 }

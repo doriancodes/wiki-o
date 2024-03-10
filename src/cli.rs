@@ -15,7 +15,7 @@ pub fn cli() -> Command {
                         .short('f')
                         .long("file")
                         .value_name("FILE")
-                        .help("The file name")
+                        .help("The file name"),
                 ),
         )
         .subcommand(
@@ -24,18 +24,18 @@ pub fn cli() -> Command {
                     .short('s')
                     .long("short")
                     .help("List all notes file names")
-                    .require_equals(false)
+                    .require_equals(false),
             ),
         )
         .subcommand(
-            Command::new("delete").about("Purge all notes").arg(
+            Command::new("delete").about("Delete all notes").arg(
                 Arg::new("all")
                     .short('a')
                     .long("all")
-                    .help("Purge all notes and delete all wiki-o files")
+                    .help("Delete all notes and delete all wiki-o files")
                     .default_missing_value("false")
                     .require_equals(false),
             ),
         )
-        .subcommand(Command::new("init").about("Initialize wiki-o configuration"))
+        .subcommand(Command::new("config").about("Show wiki-o configuration"))
 }

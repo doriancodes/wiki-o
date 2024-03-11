@@ -2,25 +2,16 @@ mod action;
 mod cli;
 mod config;
 mod context;
+mod costants;
 mod file;
 
 use anyhow::Context;
-use home::home_dir;
 
 fn main() {
     let matches = cli::cli().get_matches();
-    let config_file = format!(
-        "{}/.config/wiki-o/config.toml",
-        home_dir().unwrap().display()
-    );
-    let config = context::Context {
-        initial_config: config::InitialConfig::init().unwrap(),
-        file_buffer: None,
-        config_file: config_file.clone(),
-    }
-    .initial_config;
-    let notes_dir: &String = &config.notes_abs_dir;
-    let file_format: &String = &config.file_format;
+    let context = context::Context::without_buffer();
+    let notes_dir: &String = &context.initial_config.notes_abs_dir;
+    let file_format: &String = &context.initial_config.file_format;
 
     match matches.subcommand() {
         Some(("add", sub_matches)) => {
@@ -48,10 +39,12 @@ fn main() {
             action::delete(notes_dir, &file_name, &file_format).unwrap(); //TODO handle nicely
         }
         Some(("purge", _)) => {
-            action::purge(notes_dir, config_file).unwrap(); //TODO handle nicely
+            action::purge(notes_dir, context.config_path).unwrap();
+            //TODO handle nicely
         }
         Some(("config", _)) => {
-            println!("Current configuration: \n\n{:#?}", config); //TODO no debug
+            println!("Current configuration: \n\n{:#?}", context.initial_config);
+            //TODO no debug
         }
         _ => unreachable!(),
     }

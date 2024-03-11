@@ -1,4 +1,5 @@
 use anyhow::Result;
+use std::fs;
 use std::fs::OpenOptions;
 use std::fs::ReadDir;
 use std::io::Seek;
@@ -27,7 +28,7 @@ pub fn write_to_file(file_name: String, file_path: String, content: String) -> R
 }
 
 pub fn delete_file(file: String) -> Result<()> {
-    std::fs::remove_file(&file)?;
+    fs::remove_file(&file)?;
     println!("Deleted {}", file);
     Ok(())
 }
@@ -41,5 +42,18 @@ pub fn delete_all_dirs(dir: String) -> Result<()> {
 }
 
 pub fn read_all_files_in_dir(dir: String) -> Result<ReadDir> {
-    Ok(std::fs::read_dir(dir)?)
+    Ok(fs::read_dir(dir)?)
+}
+
+pub fn create_dir_if_not_exist(dir: &String) -> Result<bool> {
+    if fs::metadata(&dir).is_err() {
+        fs::create_dir_all(&dir)?;
+        return Ok(true);
+    }
+
+    Ok(false)
+}
+
+pub fn format_file_name(file_path: &String, file_name: &String) -> String {
+    format!("{}/{}", file_path, file_name)
 }

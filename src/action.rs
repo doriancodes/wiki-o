@@ -54,9 +54,9 @@ pub fn delete(notes_abs_dir: &String, file_name: &String, file_format: &String) 
     Ok(())
 }
 
-pub fn purge(notes_abs_dir: &String, config_file: String) -> Result<()> {
+pub fn purge(notes_abs_dir: &String, config_dir: String) -> Result<()> {
     file::delete_all_dirs(notes_abs_dir.clone())?;
-    file::delete_file(config_file.clone())?;
+    file::delete_all_dirs(config_dir.clone())?;
     Ok(())
 }
 
@@ -66,6 +66,7 @@ mod tests {
     use crate::context;
     use crate::file;
 
+    use std::env::current_dir;
     use std::fs;
 
     fn setup() -> (String, String, String, String, String) {
@@ -76,12 +77,16 @@ mod tests {
 
         fs::create_dir_all(&context.initial_config.notes_abs_dir).unwrap();
 
+        let current_dir = current_dir().unwrap().display().to_string();
+
+        let notes_dir = file::format_file_name(&current_dir, &context.initial_config.notes_abs_dir);
+
         (
             content,
             file_name,
-            context.initial_config.notes_abs_dir,
+            notes_dir,
             context.initial_config.file_format,
-            context.config_file,
+            context.config_path,
         )
     }
 
@@ -126,7 +131,6 @@ mod tests {
         let (content, file_name, notes_dir, file_format, _) = setup();
 
         add(&content, &file_name, &notes_dir, &file_format).unwrap();
-
         delete(&notes_dir, &file_name, &file_format).unwrap();
 
         assert!(
@@ -138,15 +142,13 @@ mod tests {
 
     #[test]
     fn test_purge() {
-        let (content, file_name, notes_dir, file_format, config_file) = setup();
+        let (content, file_name, notes_dir, file_format, config_path) = setup();
 
         add(&content, &file_name, &notes_dir, &file_format).unwrap();
-
-        purge(&notes_dir, config_file.clone()).unwrap();
+        purge(&notes_dir, config_path.clone()).unwrap();
 
         assert!(file::read_all_files_in_dir(notes_dir.clone()).is_err());
-
-        assert!(file::read_from_file(&config_file).is_err());
+        assert!(file::read_all_files_in_dir(config_path).is_err());
 
         teardown();
     }

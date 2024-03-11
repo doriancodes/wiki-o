@@ -1,37 +1,17 @@
 use anyhow::Result;
 use serde_derive::{Deserialize, Serialize};
-use std::fs;
 
-fn create_notes_dir(notes_dir: &String) -> Result<()> {
-    if fs::metadata(&notes_dir).is_err() {
-        fs::create_dir_all(&notes_dir)?;
-    }
+use crate::costants;
+use crate::file;
 
-    Ok(())
-}
+fn get_config(prod: bool) -> Result<Config> {
+    let (config_path, config_file_name) = costants::get_env_config(prod);
 
-fn set_config(config_path: &String) -> Result<()> {
-    let config_file = format!("{}/config.toml", config_path);
-    if fs::metadata(&config_file).is_err() {
-        fs::create_dir_all(&config_path)?;
-        let config = Config {
-            notes_dir: String::from("wiki-o/notes"),
-            file_format: String::from("md"),
-        };
-        let _config = toml::to_string(&config)?;
-        fs::write(config_file, _config)?;
-    }
+    let config_file = file::format_file_name(&config_path, &config_file_name);
 
-    Ok(())
-}
-
-fn get_config() -> Result<Config> {
-    let _config = fs::read_to_string(format!(
-        "{}/.config/wiki-o/config.toml",
-        home::home_dir().unwrap().display() //TODO handle nicely
-    ))
-    .expect("Unable to read file");
-    return Ok(toml::from_str(&_config)?);
+    let _config = file::read_from_file(&config_file)?;
+    let config: Config = toml::from_str(&_config)?;
+    Ok(config)
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -42,21 +22,12 @@ pub struct InitialConfig {
 
 impl InitialConfig {
     pub fn init() -> Result<InitialConfig> {
-        let config_path = format!("{}/.config/wiki-o", home::home_dir().unwrap().display()); //TODO handle nicely
-        set_config(&config_path)?;
-        let config = get_config()?;
-        let notes_abs_dir = format!(
-            "{}/{}",
-            home::home_dir().unwrap().display(), //TODO handle nicely
-            config.notes_dir
-        );
+        let config = get_config(true)?;
 
-        let file_format = config.file_format;
-
-        create_notes_dir(&notes_abs_dir)?;
+        file::create_dir_if_not_exist(&config.notes_dir)?;
         Ok(InitialConfig {
-            notes_abs_dir,
-            file_format,
+            notes_abs_dir: config.notes_dir,
+            file_format: config.file_format,
         })
     }
 }
@@ -64,21 +35,17 @@ impl InitialConfig {
 #[cfg(test)]
 impl Default for InitialConfig {
     fn default() -> Self {
-        let current_dir = std::env::current_dir().unwrap(); //TODO handle nicely
-        let notes_abs_dir = format!("{}/test-dir/notes", current_dir.display());
-        let config_file_dir = format!("{}/test-dir/config", current_dir.display());
-        let file_format = "md".to_string();
-        set_config(&config_file_dir).unwrap(); //TODO handle nicely
+        let config = get_config(false).unwrap(); //TODO handle nicely
 
         InitialConfig {
-            notes_abs_dir,
-            file_format,
+            notes_abs_dir: config.notes_dir,
+            file_format: config.file_format,
         }
     }
 }
 
 #[derive(Deserialize, Serialize)]
-struct Config {
-    notes_dir: String,
-    file_format: String,
+pub struct Config {
+    pub notes_dir: String,
+    pub file_format: String,
 }

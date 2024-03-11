@@ -28,9 +28,9 @@ pub fn write_to_file(file_name: String, file_path: String, content: String) -> R
     Ok(())
 }
 
-pub fn delete_file(file_name: String, file_path: String) -> Result<()> {
-    std::fs::remove_file(file_path)?;
-    println!("Deleted {}", file_name);
+pub fn delete_file(file: String) -> Result<()> {
+    std::fs::remove_file(&file)?;
+    println!("Deleted {}", file);
     Ok(())
 }
 

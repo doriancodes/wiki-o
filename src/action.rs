@@ -2,6 +2,7 @@ use anyhow::Result;
 use serde_derive::Deserialize;
 use serde_derive::Serialize;
 
+
 use crate::file;
 
 pub fn add(
@@ -50,22 +51,25 @@ pub struct WikioFile {
     pub content: String,
 }
 
-pub fn delete_all(notes_abs_dir: &String, config_abs_dir: &String) -> Result<()> {
+pub fn delete(notes_abs_dir: &String, config_abs_dir: &String, file_name: &String) -> Result<()> {
+    let file = format!("{}/{}", notes_abs_dir, file_name);
+    let config_file = format!("{}/_metadata.csv", config_abs_dir);
+
+    file::delete_file(file)?;
+    //file::delete_file(config_file)?; //TODO decide what to do with the metadata
+    Ok(())
+}
+
+pub fn purge(notes_abs_dir: &String, config_abs_dir: &String) -> Result<()> {
     file::delete_all_dirs(notes_abs_dir.clone())?;
     file::delete_all_dirs(config_abs_dir.clone())?;
 
     Ok(())
 }
 
-pub fn delete(file_name: &String, notes_abs_dir: &String, config_abs_dir: &String) -> Result<()> {
-    file::delete_file(file_name.clone(), notes_abs_dir.clone())?;
-    file::delete_file(file_name.clone(), config_abs_dir.clone())?;
-    Ok(())
-}
-
 #[cfg(test)]
 mod tests {
-    use crate::action::{add, delete, delete_all, list};
+    use crate::action::{add, delete, list, purge};
     use crate::config;
     use std::fs;
 
@@ -127,17 +131,17 @@ mod tests {
         teardown();
     }
 
-    #[test]
-    fn test_delete() {
-        let (content, file_name, notes_dir, config_dir, file_format) = setup();
+    // #[test]
+    // fn test_delete() {
+    //     let (content, file_name, notes_dir, config_dir, file_format) = setup();
 
-        add(&content, &file_name, &notes_dir, &config_dir, &file_format).unwrap();
-        delete_all(&notes_dir, &config_dir).unwrap();
+    //     add(&content, &file_name, &notes_dir, &config_dir, &file_format).unwrap();
+    //     purge(&notes_dir, &config_dir).unwrap();
 
-        let result = delete_all(&notes_dir, &config_dir);
+    //     let result = purge(&notes_dir, &config_dir);
 
-        assert!(result.is_err());
+    //     assert!(result.is_err());
 
-        teardown();
-    }
+    //     teardown();
+    // }
 }

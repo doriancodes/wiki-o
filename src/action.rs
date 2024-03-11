@@ -1,14 +1,8 @@
 use anyhow::Result;
-use core::result::Result::Ok;
 use serde_derive::Deserialize;
 use serde_derive::Serialize;
-use std::fs;
-use std::fs::OpenOptions;
-use std::io::Seek;
-use std::io::SeekFrom;
-use std::io::Write;
 
-use crate::csv;
+use crate::file;
 
 pub fn add(
     content: &String,
@@ -21,31 +15,20 @@ pub fn add(
 
     let file_path = format!("{}/{}.{}", notes_dir, file_name, file_format);
 
-    csv::write_to_csv(&file_name, file_path.clone(), config_dir)?;
+    file::write_to_csv(&file_name, &file_path, config_dir)?;
 
-    let mut note = OpenOptions::new()
-        .write(true)
-        .read(true)
-        .append(true)
-        .create(true)
-        .open(file_path)?;
-    note.seek(SeekFrom::Start(0))?;
-    note.write_all(content_f.as_bytes())?;
-
-    println!("Added {} to {}", content, file_name);
+    file::write_to_file(file_name.clone(), file_path.clone(), content_f.clone())?;
 
     Ok(())
 }
 
 pub fn list(is_short: bool, notes_dir: &String) -> Result<Vec<WikioFile>> {
-    let paths = fs::read_dir(&notes_dir)?;
+    let paths = file::read_all_files_in_dir(notes_dir.clone())?;
     let mut files: Vec<WikioFile> = vec![];
 
     for path in paths {
         let path_i = path?.path().display().to_string();
-        let content = fs::read_to_string(&path_i)
-            .expect("unable to read file")
-            .to_string();
+        let content = file::read_from_file(&path_i)?;
 
         files.push(WikioFile {
             file: path_i.clone(),
@@ -67,42 +50,22 @@ pub struct WikioFile {
     pub content: String,
 }
 
-// fn format_for_delete(is_err: bool, dir: String, e: anyhow::Error) -> Result<String> {
-fn format_for_delete(is_err: bool, dir: String) -> Result<String> {
-    let mut res = String::new();
+pub fn delete_all(notes_abs_dir: &String, config_abs_dir: &String) -> Result<()> {
+    file::delete_all_dirs(notes_abs_dir.clone())?;
+    file::delete_all_dirs(config_abs_dir.clone())?;
 
-    if is_err {
-        res.push_str(format!("Failed to delete {}\n", dir).as_str());
-    } else {
-        res.push_str(format!("Deleted directory: {}\n", dir).as_str());
-    }
-
-    return Ok(res);
+    Ok(())
 }
 
-pub fn delete(notes_abs_dir: &String, config_abs_dir: &String) -> Result<()> {
-    let mut message = String::new();
-    let stdout = std::io::stdout();
-    let mut handle = stdout.lock();
-
-    match std::fs::remove_dir_all(notes_abs_dir) {
-        Ok(_) => message.push_str(&format_for_delete(false, notes_abs_dir.clone())?),
-        Err(_) => message.push_str(&format_for_delete(true, notes_abs_dir.clone())?),
-    };
-
-    match std::fs::remove_dir_all(config_abs_dir) {
-        Ok(_) => message.push_str(&format_for_delete(false, config_abs_dir.clone())?),
-        Err(_) => message.push_str(&format_for_delete(true, config_abs_dir.clone())?),
-    };
-
-    writeln!(handle, "{}", message)?;
-
+pub fn delete(file_name: &String, notes_abs_dir: &String, config_abs_dir: &String) -> Result<()> {
+    file::delete_file(file_name.clone(), notes_abs_dir.clone())?;
+    file::delete_file(file_name.clone(), config_abs_dir.clone())?;
     Ok(())
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::action::{add, delete, list};
+    use crate::action::{add, delete, delete_all, list};
     use crate::config;
     use std::fs;
 
@@ -136,7 +99,7 @@ mod tests {
     fn test_add() {
         let (content, file_name, notes_dir, config_dir, file_format) = setup();
 
-        add(&content, &file_name, &notes_dir, &config_dir, &file_format);
+        add(&content, &file_name, &notes_dir, &config_dir, &file_format).unwrap();
 
         assert_eq!(
             fs::read_to_string(format!("{}/{}.{}", &notes_dir, &file_name, &file_format))
@@ -152,7 +115,7 @@ mod tests {
     fn test_list() {
         let (content, file_name, notes_dir, config_dir, file_format) = setup();
 
-        add(&content, &file_name, &notes_dir, &config_dir, &file_format);
+        add(&content, &file_name, &notes_dir, &config_dir, &file_format).unwrap();
 
         let files = list(false, &notes_dir);
 
@@ -168,16 +131,13 @@ mod tests {
     fn test_delete() {
         let (content, file_name, notes_dir, config_dir, file_format) = setup();
 
-        add(&content, &file_name, &notes_dir, &config_dir, &file_format);
-        delete(&notes_dir, &config_dir);
+        add(&content, &file_name, &notes_dir, &config_dir, &file_format).unwrap();
+        delete_all(&notes_dir, &config_dir).unwrap();
 
-        let result = delete(&notes_dir, &config_dir);
+        let result = delete_all(&notes_dir, &config_dir);
+
+        assert!(result.is_err());
 
         teardown();
-
-        // let expected: Err = Err(std::io::Error::from(std::io::ErrorKind::NotFound));
-
-        // assert_eq!(fs::read_dir(&notes_dir).unwrap().count(), 0);
-        // assert_eq!(fs::read_dir(&config_dir).unwrap().count(), 0);
     }
 }

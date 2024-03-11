@@ -1,6 +1,6 @@
+use anyhow::Result;
 use serde_derive::{Deserialize, Serialize};
 use std::fs;
-use anyhow::Result;
 
 fn create_dirs(notes_dir: &String, config_dir: &String) -> Result<()> {
     if fs::metadata(&notes_dir).is_err() {
@@ -13,7 +13,7 @@ fn create_dirs(notes_dir: &String, config_dir: &String) -> Result<()> {
     Ok(())
 }
 
-fn set_config() -> Result<()>{
+fn set_config() -> Result<()> {
     let config_path = format!("{}/.config/wiki-o", home::home_dir().unwrap().display()); //TODO handle nicely
     if fs::metadata(&config_path).is_err() {
         fs::create_dir_all(&config_path)?;
@@ -29,11 +29,9 @@ fn set_config() -> Result<()>{
         };
         let _config = toml::to_string(&config)?;
         fs::write(config_file, _config)?;
-
     }
 
     Ok(())
-
 }
 
 fn get_config() -> Result<Config> {
@@ -53,7 +51,7 @@ pub struct InitialConfig {
 }
 
 impl InitialConfig {
-    pub fn init() -> Result<InitialConfig>{
+    pub fn init() -> Result<InitialConfig> {
         set_config()?;
         let config = get_config()?;
         let notes_abs_dir = format!(

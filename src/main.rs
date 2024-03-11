@@ -5,10 +5,20 @@ mod context;
 mod file;
 
 use anyhow::Context;
+use home::home_dir;
 
 fn main() {
     let matches = cli::cli().get_matches();
-    let config = context::Context::without_buffer().initial_config;
+    let config_file = format!(
+        "{}/.config/wiki-o/config.toml",
+        home_dir().unwrap().display()
+    );
+    let config = context::Context {
+        initial_config: config::InitialConfig::init().unwrap(),
+        file_buffer: None,
+        config_file: config_file.clone(),
+    }
+    .initial_config;
     let notes_dir: &String = &config.notes_abs_dir;
     let file_format: &String = &config.file_format;
 
@@ -35,10 +45,10 @@ fn main() {
                 .get_one::<String>("FILE")
                 .context("file name is required")
                 .unwrap();
-            action::delete(notes_dir, &file_name).unwrap(); //TODO handle nicely
+            action::delete(notes_dir, &file_name, &file_format).unwrap(); //TODO handle nicely
         }
         Some(("purge", _)) => {
-            action::purge(notes_dir).unwrap(); //TODO handle nicely
+            action::purge(notes_dir, config_file).unwrap(); //TODO handle nicely
         }
         Some(("config", _)) => {
             println!("Current configuration: \n\n{:#?}", config); //TODO no debug

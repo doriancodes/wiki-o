@@ -47,51 +47,51 @@ pub struct WikioFile {
     pub content: String,
 }
 
-pub fn delete(notes_abs_dir: &String, file_name: &String) -> Result<()> {
-    let file = format!("{}/{}", notes_abs_dir, file_name);
+pub fn delete(notes_abs_dir: &String, file_name: &String, file_format: &String) -> Result<()> {
+    let file = format!("{}/{}.{}", notes_abs_dir, file_name, file_format);
 
     file::delete_file(file)?;
     Ok(())
 }
 
-pub fn purge(notes_abs_dir: &String) -> Result<()> {
+pub fn purge(notes_abs_dir: &String, config_file: String) -> Result<()> {
     file::delete_all_dirs(notes_abs_dir.clone())?;
+    file::delete_file(config_file.clone())?;
     Ok(())
 }
 
 #[cfg(test)]
 mod tests {
     use crate::action::{add, delete, list, purge};
-    use crate::config;
+    use crate::context;
+    use crate::file;
+
     use std::fs;
 
-    fn setup() -> (String, String, String, String) {
-        let initial_config = config::InitialConfig::default();
+    fn setup() -> (String, String, String, String, String) {
+        let context = context::Context::default();
 
         let content = "test content".to_string();
         let file_name = "test".to_string();
 
-        fs::create_dir_all(&initial_config.notes_abs_dir).unwrap();
+        fs::create_dir_all(&context.initial_config.notes_abs_dir).unwrap();
 
-        return (
+        (
             content,
             file_name,
-            initial_config.notes_abs_dir,
-            initial_config.file_format,
-        );
+            context.initial_config.notes_abs_dir,
+            context.initial_config.file_format,
+            context.config_file,
+        )
     }
 
     fn teardown() {
-        let initial_config = config::InitialConfig::default();
-
-        println!("{:#?}", initial_config);
-
         fs::remove_dir_all("test-dir").unwrap();
     }
 
     #[test]
     fn test_add() {
-        let (content, file_name, notes_dir, file_format) = setup();
+        let (content, file_name, notes_dir, file_format, _) = setup();
 
         add(&content, &file_name, &notes_dir, &file_format).unwrap();
 
@@ -107,7 +107,7 @@ mod tests {
 
     #[test]
     fn test_list() {
-        let (content, file_name, notes_dir, file_format) = setup();
+        let (content, file_name, notes_dir, file_format, _) = setup();
 
         add(&content, &file_name, &notes_dir, &file_format).unwrap();
 
@@ -121,17 +121,33 @@ mod tests {
         teardown();
     }
 
-    // #[test]
-    // fn test_delete() {
-    //     let (content, file_name, notes_dir, config_dir, file_format) = setup();
+    #[test]
+    fn test_delete() {
+        let (content, file_name, notes_dir, file_format, _) = setup();
 
-    //     add(&content, &file_name, &notes_dir, &config_dir, &file_format).unwrap();
-    //     purge(&notes_dir, &config_dir).unwrap();
+        add(&content, &file_name, &notes_dir, &file_format).unwrap();
 
-    //     let result = purge(&notes_dir, &config_dir);
+        delete(&notes_dir, &file_name, &file_format).unwrap();
 
-    //     assert!(result.is_err());
+        assert!(
+            fs::read_to_string(format!("{}/{}.{}", &notes_dir, &file_name, &file_format)).is_err()
+        );
 
-    //     teardown();
-    // }
+        teardown();
+    }
+
+    #[test]
+    fn test_purge() {
+        let (content, file_name, notes_dir, file_format, config_file) = setup();
+
+        add(&content, &file_name, &notes_dir, &file_format).unwrap();
+
+        purge(&notes_dir, config_file.clone()).unwrap();
+
+        assert!(file::read_all_files_in_dir(notes_dir.clone()).is_err());
+
+        assert!(file::read_from_file(&config_file).is_err());
+
+        teardown();
+    }
 }

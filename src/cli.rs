@@ -37,6 +37,9 @@ pub fn cli() -> Command {
                     .require_equals(true),
             ),
         )
-        .subcommand(Command::new("purge").about("Purge all notes and wiki-o files"))
+        .subcommand(
+            Command::new("purge")
+                .about("Purge all notes and wiki-o configuration for a clean slate"),
+        )
         .subcommand(Command::new("config").about("Show wiki-o configuration"))
 }

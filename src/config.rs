@@ -10,11 +10,10 @@ fn create_notes_dir(notes_dir: &String) -> Result<()> {
     Ok(())
 }
 
-fn set_config() -> Result<()> {
-    let config_path = format!("{}/.config/wiki-o", home::home_dir().unwrap().display()); //TODO handle nicely
-    if fs::metadata(&config_path).is_err() {
+fn set_config(config_path: &String) -> Result<()> {
+    let config_file = format!("{}/config.toml", config_path);
+    if fs::metadata(&config_file).is_err() {
         fs::create_dir_all(&config_path)?;
-        let config_file = format!("{}/config.toml", config_path);
         let config = Config {
             notes_dir: String::from("wiki-o/notes"),
             file_format: String::from("md"),
@@ -43,7 +42,8 @@ pub struct InitialConfig {
 
 impl InitialConfig {
     pub fn init() -> Result<InitialConfig> {
-        set_config()?;
+        let config_path = format!("{}/.config/wiki-o", home::home_dir().unwrap().display()); //TODO handle nicely
+        set_config(&config_path)?;
         let config = get_config()?;
         let notes_abs_dir = format!(
             "{}/{}",
@@ -54,10 +54,10 @@ impl InitialConfig {
         let file_format = config.file_format;
 
         create_notes_dir(&notes_abs_dir)?;
-        return Ok(InitialConfig {
+        Ok(InitialConfig {
             notes_abs_dir,
             file_format,
-        });
+        })
     }
 }
 
@@ -66,12 +66,14 @@ impl Default for InitialConfig {
     fn default() -> Self {
         let current_dir = std::env::current_dir().unwrap(); //TODO handle nicely
         let notes_abs_dir = format!("{}/test-dir/notes", current_dir.display());
+        let config_file_dir = format!("{}/test-dir/config", current_dir.display());
         let file_format = "md".to_string();
+        set_config(&config_file_dir).unwrap(); //TODO handle nicely
 
-        return InitialConfig {
-            notes_abs_dir: notes_abs_dir,
-            file_format: file_format,
-        };
+        InitialConfig {
+            notes_abs_dir,
+            file_format,
+        }
     }
 }
 

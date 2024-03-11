@@ -18,7 +18,8 @@ Usage: wiki-o [COMMAND]
 Commands:
   add     Add note
   list    List all notes
-  delete  Delete all notes
+  delete  Delete a note
+  purge   Purge all notes and wiki-o configuration for a clean slate
   config  Show wiki-o configuration
   help    Print this message or the help of the given subcommand(s)
 
@@ -69,9 +70,16 @@ File: <home_dir>/wiki-o/.notes/my_notes.md
 ### Delete
 
 ```console
-$ wiki-o delete
-Deleted directory: <home_dir>/wiki-o/.notes
-Deleted directory: <home_dir>/wiki-o/.config
+$ wiki-o delete -f=my_notes
+Deleted: <home_dir>/wiki-o/notes/my_notes.md
+```
+
+### Purge
+
+```console
+$ wiki-o purge
+Deleted directory: <home_dir>/wiki-o/notes
+Deleted <home_dir>/.config/wiki-o/config.toml
 ```
 
 ### Configuration
@@ -80,12 +88,8 @@ By default the config file is located under `~/.config/wiki-o`.
 
 ```toml
 # config.toml
-[directories]
-notes = "wiki-o/.notes"
-config = "wiki-o/.config"
-
-[editor]
-format = "md"
+notes_dir = "wiki-o/notes"
+file_format = "md"
 ```
 
 ## Development

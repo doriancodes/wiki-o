@@ -28,16 +28,14 @@ pub fn cli() -> Command {
             ),
         )
         .subcommand(
-            Command::new("delete")
-                .about("Delete a note")
-                .arg(
-                    Arg::new("FILE")
-                        .short('f')
-                        .long("file")
-                        .value_name("FILE")
-                        .help("The file name")
-                        .require_equals(true),
-                ),
+            Command::new("delete").about("Delete a note").arg(
+                Arg::new("FILE")
+                    .short('f')
+                    .long("file")
+                    .value_name("FILE")
+                    .help("The file name")
+                    .require_equals(true),
+            ),
         )
         .subcommand(Command::new("purge").about("Purge all notes and wiki-o files"))
         .subcommand(Command::new("config").about("Show wiki-o configuration"))

@@ -1,3 +1,4 @@
+use anyhow::Result;
 use core::result::Result::Ok;
 use serde_derive::Deserialize;
 use serde_derive::Serialize;
@@ -15,32 +16,33 @@ pub fn add(
     notes_dir: &String,
     config_dir: &String,
     file_format: &String,
-) {
+) -> Result<()> {
     let content_f = format!("{}\n\n", content);
 
     let file_path = format!("{}/{}.{}", notes_dir, file_name, file_format);
 
-    csv::write_to_csv(&file_name, file_path.clone(), config_dir).unwrap();
+    csv::write_to_csv(&file_name, file_path.clone(), config_dir)?;
 
     let mut note = OpenOptions::new()
         .write(true)
         .read(true)
         .append(true)
         .create(true)
-        .open(file_path)
-        .unwrap();
-    note.seek(SeekFrom::Start(0)).unwrap();
-    note.write_all(content_f.as_bytes()).unwrap();
+        .open(file_path)?;
+    note.seek(SeekFrom::Start(0))?;
+    note.write_all(content_f.as_bytes())?;
 
     println!("Added {} to {}", content, file_name);
+
+    Ok(())
 }
 
-pub fn list(is_short: bool, notes_dir: &String) -> Vec<WikioFile> {
-    let paths = fs::read_dir(&notes_dir).unwrap();
+pub fn list(is_short: bool, notes_dir: &String) -> Result<Vec<WikioFile>> {
+    let paths = fs::read_dir(&notes_dir)?;
     let mut files: Vec<WikioFile> = vec![];
 
     for path in paths {
-        let path_i = path.unwrap().path().display().to_string();
+        let path_i = path?.path().display().to_string();
         let content = fs::read_to_string(&path_i)
             .expect("unable to read file")
             .to_string();
@@ -56,7 +58,7 @@ pub fn list(is_short: bool, notes_dir: &String) -> Vec<WikioFile> {
         }
     }
 
-    return files;
+    return Ok(files);
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -65,43 +67,37 @@ pub struct WikioFile {
     pub content: String,
 }
 
-fn format_for_delete(is_err: bool, dir: String, e: Option<std::io::Error>) -> String {
+// fn format_for_delete(is_err: bool, dir: String, e: anyhow::Error) -> Result<String> {
+fn format_for_delete(is_err: bool, dir: String) -> Result<String> {
     let mut res = String::new();
 
     if is_err {
-        res.push_str(
-            format!(
-                "Failed to delete {}, error {}\n",
-                dir,
-                e.unwrap().to_string()
-            )
-            .as_str(),
-        );
+        res.push_str(format!("Failed to delete {}\n", dir).as_str());
     } else {
         res.push_str(format!("Deleted directory: {}\n", dir).as_str());
     }
 
-    return res;
+    return Ok(res);
 }
 
-pub fn delete(notes_abs_dir: &String, config_abs_dir: &String) {
+pub fn delete(notes_abs_dir: &String, config_abs_dir: &String) -> Result<()> {
     let mut message = String::new();
     let stdout = std::io::stdout();
     let mut handle = stdout.lock();
 
     match std::fs::remove_dir_all(notes_abs_dir) {
-        Ok(_) => message.push_str(&format_for_delete(false, notes_abs_dir.clone(), None)),
-        Err(e) => message.push_str(&format_for_delete(true, notes_abs_dir.clone(), Some(e))),
+        Ok(_) => message.push_str(&format_for_delete(false, notes_abs_dir.clone())?),
+        Err(_) => message.push_str(&format_for_delete(true, notes_abs_dir.clone())?),
     };
 
     match std::fs::remove_dir_all(config_abs_dir) {
-        Ok(_) => message.push_str(&format_for_delete(false, config_abs_dir.clone(), None)),
-        Err(e) => message.push_str(&format_for_delete(true, config_abs_dir.clone(), Some(e))),
+        Ok(_) => message.push_str(&format_for_delete(false, config_abs_dir.clone())?),
+        Err(_) => message.push_str(&format_for_delete(true, config_abs_dir.clone())?),
     };
 
-    writeln!(handle, "{}", message).unwrap();
+    writeln!(handle, "{}", message)?;
 
-    // println!("{}",message);
+    Ok(())
 }
 
 #[cfg(test)]
@@ -161,7 +157,7 @@ mod tests {
         let files = list(false, &notes_dir);
 
         assert_eq!(
-            files[0].file,
+            files.unwrap()[0].file,
             format!("{}/{}.{}", &notes_dir, &file_name, &file_format)
         );
 

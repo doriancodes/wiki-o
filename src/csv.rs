@@ -1,13 +1,10 @@
-use std::{error::Error, fs::OpenOptions, io::Seek};
+use std::{fs::OpenOptions, io::Seek};
 
+use anyhow::Result;
 use serde_derive::{Deserialize, Serialize};
 use uuid::Uuid;
 
-pub fn write_to_csv(
-    file_name: &String,
-    file_path: String,
-    config_dir: &String,
-) -> Result<(), Box<dyn Error>> {
+pub fn write_to_csv(file_name: &String, file_path: String, config_dir: &String) -> Result<()> {
     let mut file = OpenOptions::new()
         .write(true)
         .read(true)

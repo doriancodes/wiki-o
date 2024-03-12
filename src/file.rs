@@ -1,10 +1,20 @@
 use anyhow::Result;
+use serde_derive::Deserialize;
+use serde_derive::Serialize;
 use std::fs;
 use std::fs::OpenOptions;
-use std::fs::ReadDir;
 use std::io::Seek;
 use std::io::SeekFrom;
 use std::io::Write;
+
+use crate::logging::deleted;
+use crate::logging::{added, header, text};
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct WikioFile {
+    pub file: String,
+    pub content: String,
+}
 
 pub fn read_from_file(file_path: &String) -> Result<String> {
     let content = std::fs::read_to_string(file_path)?;
@@ -22,27 +32,48 @@ pub fn write_to_file(file_name: String, file_path: String, content: String) -> R
     file.seek(SeekFrom::Start(0))?;
     file.write_all(content.as_bytes())?;
 
-    println!("Added {} to {}", content.trim(), file_name);
+    added(content.trim().to_string(), file_name.to_string());
 
     Ok(())
 }
 
 pub fn delete_file(file: String) -> Result<()> {
     fs::remove_file(&file)?;
-    println!("Deleted {}", file);
+    deleted(true, file);
     Ok(())
 }
 
 pub fn delete_all_dirs(dir: String) -> Result<()> {
-    let deleted = std::fs::remove_dir_all(&dir);
-    if deleted.is_ok() {
-        println!("Deleted directory: {}", dir);
+    let deleted_dir = std::fs::remove_dir_all(&dir);
+    if deleted_dir.is_ok() {
+        deleted(false, dir);
     }
     Ok(())
 }
 
-pub fn read_all_files_in_dir(dir: String) -> Result<ReadDir> {
-    Ok(fs::read_dir(dir)?)
+pub fn read_all_files_in_dir(dir: String, detailed: bool) -> Result<Vec<WikioFile>> {
+    let paths = fs::read_dir(dir)?;
+
+    let mut files: Vec<WikioFile> = vec![];
+
+    for path in paths {
+        let path = path?;
+        let file_i = path.file_name().to_str().get_or_insert("").to_string();
+        let path_i = path.path().display().to_string();
+        let content = read_from_file(&path_i)?;
+
+        files.push(WikioFile {
+            file: path_i.clone(),
+            content: content.clone(),
+        });
+
+        header("File:".to_string(), file_i);
+        if detailed {
+            text(content);
+        }
+    }
+
+    return Ok(files);
 }
 
 pub fn create_dir_if_not_exist(dir: &String) -> Result<String> {

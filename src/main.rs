@@ -1,11 +1,14 @@
-mod action;
-mod cli;
+pub mod action;
+pub mod cli;
 pub mod env;
-mod file;
+pub mod file;
+pub mod logging;
 
 use anyhow::Context;
 use env::{Environment, WContext};
 use home::home_dir;
+
+use crate::logging::show_config;
 
 fn main() {
     let matches = cli::cli().get_matches();
@@ -43,12 +46,11 @@ fn main() {
             action::delete(&notes_dir, &file_name, &file_format).unwrap(); //TODO handle nicely
         }
         Some(("purge", _)) => {
-            action::purge(&notes_dir, "/Users/dorian/.config/wiki-o".to_string()).unwrap();
+            action::purge(&notes_dir).unwrap();
             //TODO handle nicely
         }
         Some(("config", _)) => {
-            println!("Current configuration: \n\n{:#?}", config);
-            //TODO no debug
+            show_config("Current configuration: ".to_string(), config.to_string());
         }
         _ => unreachable!(),
     }

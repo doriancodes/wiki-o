@@ -1,4 +1,4 @@
-use std::{env::current_dir, fs};
+use std::{env::current_dir, fmt::Display, fs};
 
 use crate::file;
 
@@ -11,6 +11,16 @@ use serde_derive::{Deserialize, Serialize};
 pub struct Config {
     pub notes_dir: String,
     pub file_format: String,
+}
+
+impl Display for Config {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "notes directory: {}\nfile format: {}",
+            self.notes_dir, self.file_format
+        )
+    }
 }
 
 pub trait Environment {

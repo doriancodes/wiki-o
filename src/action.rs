@@ -1,8 +1,6 @@
 use anyhow::Result;
-use serde_derive::Deserialize;
-use serde_derive::Serialize;
 
-use crate::file;
+use crate::file::{self, WikioFile};
 
 pub fn add(
     content: &String,
@@ -20,43 +18,18 @@ pub fn add(
 }
 
 pub fn list(is_short: bool, notes_dir: &String) -> Result<Vec<WikioFile>> {
-    let paths = file::read_all_files_in_dir(notes_dir.clone())?;
-    let mut files: Vec<WikioFile> = vec![];
-
-    for path in paths {
-        let path_i = path?.path().display().to_string();
-        let content = file::read_from_file(&path_i)?;
-
-        files.push(WikioFile {
-            file: path_i.clone(),
-            content: content.clone(),
-        });
-
-        println!("File: {}", path_i);
-        if !is_short {
-            print!("\n{}\n", content);
-        }
-    }
-
-    return Ok(files);
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct WikioFile {
-    pub file: String,
-    pub content: String,
+    file::read_all_files_in_dir(notes_dir.clone(), !is_short)
 }
 
 pub fn delete(notes_abs_dir: &String, file_name: &String, file_format: &String) -> Result<()> {
     let file = format!("{}/{}.{}", notes_abs_dir, file_name, file_format);
 
-    file::delete_file(file)?;
+    file::delete_file(file.clone())?;
     Ok(())
 }
 
-pub fn purge(notes_abs_dir: &String, config_dir: String) -> Result<()> {
+pub fn purge(notes_abs_dir: &String) -> Result<()> {
     file::delete_all_dirs(notes_abs_dir.clone())?;
-    file::delete_all_dirs(config_dir.clone())?;
     Ok(())
 }
 
@@ -68,7 +41,7 @@ mod tests {
 
     use std::fs;
 
-    fn setup() -> (String, String, String, String, String) {
+    fn setup() -> (String, String, String, String) {
         let test_ctx: TestContext = TestContext {
             config_dir: "test-dir/config".to_string(),
         };
@@ -79,13 +52,7 @@ mod tests {
 
         let notes_dir = test_ctx.notes_abs_dir().unwrap();
 
-        (
-            content,
-            file_name,
-            notes_dir,
-            config.file_format,
-            test_ctx.config_dir,
-        )
+        (content, file_name, notes_dir, config.file_format)
     }
 
     fn teardown() {
@@ -94,7 +61,7 @@ mod tests {
 
     #[test]
     fn test_add() {
-        let (content, file_name, notes_dir, file_format, _) = setup();
+        let (content, file_name, notes_dir, file_format) = setup();
 
         add(&content, &file_name, &notes_dir, &file_format).unwrap();
 
@@ -110,7 +77,7 @@ mod tests {
 
     #[test]
     fn test_list() {
-        let (content, file_name, notes_dir, file_format, _) = setup();
+        let (content, file_name, notes_dir, file_format) = setup();
 
         add(&content, &file_name, &notes_dir, &file_format).unwrap();
 
@@ -126,7 +93,7 @@ mod tests {
 
     #[test]
     fn test_delete() {
-        let (content, file_name, notes_dir, file_format, _) = setup();
+        let (content, file_name, notes_dir, file_format) = setup();
 
         add(&content, &file_name, &notes_dir, &file_format).unwrap();
         delete(&notes_dir, &file_name, &file_format).unwrap();
@@ -140,13 +107,12 @@ mod tests {
 
     #[test]
     fn test_purge() {
-        let (content, file_name, notes_dir, file_format, config_path) = setup();
+        let (content, file_name, notes_dir, file_format) = setup();
 
         add(&content, &file_name, &notes_dir, &file_format).unwrap();
-        purge(&notes_dir, config_path.clone()).unwrap();
+        purge(&notes_dir).unwrap();
 
-        assert!(file::read_all_files_in_dir(notes_dir.clone()).is_err());
-        assert!(file::read_all_files_in_dir(config_path).is_err());
+        assert!(file::read_all_files_in_dir(notes_dir.clone(), false).is_err());
 
         teardown();
     }

@@ -63,30 +63,28 @@ pub fn purge(notes_abs_dir: &String, config_dir: String) -> Result<()> {
 #[cfg(test)]
 mod tests {
     use crate::action::{add, delete, list, purge};
-    use crate::context;
+    use crate::env::{Environment, TestContext};
     use crate::file;
 
-    use std::env::current_dir;
     use std::fs;
 
     fn setup() -> (String, String, String, String, String) {
-        let context = context::Context::default();
+        let test_ctx: TestContext = TestContext {
+            config_dir: "test-dir/config".to_string(),
+        };
+        let config = test_ctx.config().unwrap();
 
         let content = "test content".to_string();
         let file_name = "test".to_string();
 
-        fs::create_dir_all(&context.initial_config.notes_abs_dir).unwrap();
-
-        let current_dir = current_dir().unwrap().display().to_string();
-
-        let notes_dir = file::format_file_name(&current_dir, &context.initial_config.notes_abs_dir);
+        let notes_dir = test_ctx.notes_abs_dir().unwrap();
 
         (
             content,
             file_name,
             notes_dir,
-            context.initial_config.file_format,
-            context.config_path,
+            config.file_format,
+            test_ctx.config_dir,
         )
     }
 

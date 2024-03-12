@@ -45,15 +45,11 @@ pub fn read_all_files_in_dir(dir: String) -> Result<ReadDir> {
     Ok(fs::read_dir(dir)?)
 }
 
-pub fn create_dir_if_not_exist(dir: &String) -> Result<bool> {
+pub fn create_dir_if_not_exist(dir: &String) -> Result<String> {
     if fs::metadata(&dir).is_err() {
         fs::create_dir_all(&dir)?;
-        return Ok(true);
+        return Ok(dir.clone());
     }
 
-    Ok(false)
-}
-
-pub fn format_file_name(file_path: &String, file_name: &String) -> String {
-    format!("{}/{}", file_path, file_name)
+    Ok(dir.clone())
 }

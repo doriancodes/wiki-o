@@ -1,17 +1,21 @@
 mod action;
 mod cli;
-mod config;
-mod context;
-mod costants;
+pub mod env;
 mod file;
 
 use anyhow::Context;
+use env::{Environment, WContext};
+use home::home_dir;
 
 fn main() {
     let matches = cli::cli().get_matches();
-    let context = context::Context::without_buffer();
-    let notes_dir: &String = &context.initial_config.notes_abs_dir;
-    let file_format: &String = &context.initial_config.file_format;
+
+    let wcontext: WContext = WContext {
+        config_dir: format!("{}/.config/wiki-o", home_dir().unwrap().display()),
+    };
+    let config = wcontext.config().unwrap();
+    let notes_dir = wcontext.notes_abs_dir().unwrap();
+    let file_format: &String = &config.file_format;
 
     match matches.subcommand() {
         Some(("add", sub_matches)) => {
@@ -21,7 +25,7 @@ fn main() {
                 _ => "my_notes".to_string(),
             };
 
-            action::add(content, &file_name, notes_dir, file_format).unwrap(); //TODO handle nicely
+            action::add(content, &file_name, &notes_dir, file_format).unwrap(); //TODO handle nicely
         }
         Some(("list", sub_matches)) => {
             let is_short: bool = match sub_matches.get_one::<String>("SHORT") {
@@ -29,21 +33,21 @@ fn main() {
                 _ => false,
             };
 
-            action::list(is_short, notes_dir).unwrap(); //TODO handle nicely
+            action::list(is_short, &notes_dir).unwrap(); //TODO handle nicely
         }
         Some(("delete", sub_matches)) => {
             let file_name = sub_matches
                 .get_one::<String>("FILE")
                 .context("file name is required")
                 .unwrap();
-            action::delete(notes_dir, &file_name, &file_format).unwrap(); //TODO handle nicely
+            action::delete(&notes_dir, &file_name, &file_format).unwrap(); //TODO handle nicely
         }
         Some(("purge", _)) => {
-            action::purge(notes_dir, context.config_path).unwrap();
+            action::purge(&notes_dir, "/Users/dorian/.config/wiki-o".to_string()).unwrap();
             //TODO handle nicely
         }
         Some(("config", _)) => {
-            println!("Current configuration: \n\n{:#?}", context.initial_config);
+            println!("Current configuration: \n\n{:#?}", config);
             //TODO no debug
         }
         _ => unreachable!(),

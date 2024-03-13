@@ -86,7 +86,7 @@ Deleted <home_dir>/.config/wiki-o/config.toml
 
 By default the config file is located under `~/.config/wiki-o`.
 
-```toml
+```tomlcurrent_dir()?.join("temp")
 # config.toml
 notes_dir = "wiki-o/notes"
 file_format = "md"
@@ -99,6 +99,24 @@ For now run all tests in the same thread:
 ```console
 RUST_TEST_THREADS=1 cargo test
 ```
+
+## TODO
+
+- [ ] Refactor repo structure
+- [ ] Improve test coverage
+- [ ] Allow piping commands
+- [ ] Improve search
+- [ ] Allow styling
+- [ ] Explore interoperability with other tools (editors like vim/emacs, logseq, ollama)
+- [ ] Remote sync via ssh
+- [ ] Check how to package for release
+- [ ] Check how to add docs
+- [ ] Add deamon (maybe), watch file changes
+- [ ] Explore tags
+- [ ] Explore analytics tools
+- [ ] Design copy/paste feature
+- [ ] Performance tuning
+
 
 ## License
 

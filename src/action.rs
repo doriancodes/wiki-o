@@ -27,8 +27,6 @@ pub fn show(file_name: &String, notes_dir: &String) -> Result<Vec<WikioFile>> {
             text(f.content.clone());
      });
     Ok(files)
-
-
 }
 
 pub fn list(is_short: bool, notes_dir: &String) -> Result<Vec<WikioFile>> {
@@ -42,6 +40,20 @@ pub fn list(is_short: bool, notes_dir: &String) -> Result<Vec<WikioFile>> {
         });
 
     Ok(files)
+}
+
+pub fn search(search_str: &String, notes_dir: &String) -> Result<()> {
+
+
+    let files = file::read_all_files_in_dir(notes_dir.clone())?;
+
+    Ok(files.iter().for_each(|f: &WikioFile| {
+        if f.content.contains(search_str) {
+            header("File:".to_string(), f.file_name.clone());
+            text(f.content.clone());
+        }
+    }))
+
 }
 
 pub fn delete(notes_abs_dir: &String, file_name: &String, file_format: &String) -> Result<()> {

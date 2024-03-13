@@ -40,6 +40,12 @@ pub fn cli() -> Command {
             ),
         )
         .subcommand(
+            Command::new("search")
+            .about("Search notes for similar content")
+            .arg(arg!(<SEARCH_STRING> "The search_string"))
+            .arg_required_else_help(true)
+        )
+        .subcommand(
             Command::new("delete").about("Delete a note").arg(
                 Arg::new("FILE")
                     .short('f')

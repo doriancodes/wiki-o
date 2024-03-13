@@ -3,6 +3,7 @@ pub mod cli;
 pub mod env;
 pub mod file;
 pub mod logging;
+pub mod src_engine;
 
 use std::path::PathBuf;
 
@@ -47,6 +48,11 @@ fn main() -> Result<()> {
             action::list(is_short, &notes_dir)?;
             Ok(())
         }
+        Some(("search", sub_matches)) => {
+            let search_string = sub_matches.get_one::<String>("SEARCH_STRING").expect("required");
+            action::search(search_string, &notes_dir)?;
+            Ok(())
+        }
         Some(("delete", sub_matches)) => {
             let file_name = sub_matches.get_one::<String>("FILE").expect("required");
             action::delete(&notes_dir, &file_name, &file_format)?;
@@ -57,7 +63,11 @@ fn main() -> Result<()> {
             Ok(())
         }
         Some(("config", _)) => {
-            show_config("Current configuration: ".to_string(), config.to_string());
+            // show_config("Current configuration: ".to_string(), config.to_string());
+            let mut src = src_engine::SearchEngine::new()?;
+            src.build_index()?;
+            src.search()?;
+
             Ok(())
         }
         _ => unreachable!(),

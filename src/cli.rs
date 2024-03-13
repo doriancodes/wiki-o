@@ -43,3 +43,20 @@ pub fn cli() -> Command {
         )
         .subcommand(Command::new("config").about("Show wiki-o configuration"))
 }
+
+#[cfg(test)]
+mod tests {
+
+    use super::cli;
+
+    #[test]
+    fn test_config_command() {
+        let cli = cli();
+
+        let m: clap::ArgMatches = cli.try_get_matches_from(["wiki-o", "add", "new"]).unwrap();
+
+        let (_, add_cmd) = m.subcommand().unwrap();
+
+        assert_eq!(add_cmd.get_one::<String>("NOTE").unwrap(), "new");
+    }
+}

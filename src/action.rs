@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use crate::file::{self, WikioFile};
+use crate::{file::{self, WikioFile}, logging::{header, text}};
 
 pub fn add(
     content: &String,
@@ -17,8 +17,31 @@ pub fn add(
     Ok(())
 }
 
+pub fn show(file_name: &String, notes_dir: &String) -> Result<Vec<WikioFile>> {
+    let files = file::read_all_files_in_dir(notes_dir.clone())?;
+    files.iter()
+    .filter(|f| f.file_name.contains(file_name))
+    .collect::<Vec<&WikioFile>>()
+    .iter().for_each(|f| {
+            header("File:".to_string(), f.file_name.clone());
+            text(f.content.clone());
+     });
+    Ok(files)
+
+
+}
+
 pub fn list(is_short: bool, notes_dir: &String) -> Result<Vec<WikioFile>> {
-    file::read_all_files_in_dir(notes_dir.clone(), !is_short)
+    let files = file::read_all_files_in_dir(notes_dir.clone())?;
+
+    files.iter().for_each(|f: &WikioFile| {
+        header("File:".to_string(), f.file_name.clone());
+        if !is_short {
+            text(f.content.clone());
+        }
+        });
+
+    Ok(files)
 }
 
 pub fn delete(notes_abs_dir: &String, file_name: &String, file_format: &String) -> Result<()> {
@@ -112,7 +135,7 @@ mod tests {
         add(&content, &file_name, &notes_dir, &file_format).unwrap();
         purge(&notes_dir).unwrap();
 
-        assert!(file::read_all_files_in_dir(notes_dir.clone(), false).is_err());
+        assert!(file::read_all_files_in_dir(notes_dir.clone()).is_err());
 
         teardown();
     }

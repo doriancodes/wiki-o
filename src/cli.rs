@@ -19,6 +19,18 @@ pub fn cli() -> Command {
                 ),
         )
         .subcommand(
+            Command::new("show")
+                .about("Show files with similar name")
+                .arg(
+                    Arg::new("FILE")
+                    .short('f')
+                    .long("file")
+                    .value_name("FILE")
+                    .help("The file name"),
+                )
+
+        )
+        .subcommand(
             Command::new("list").about("List all notes").arg(
                 Arg::new("SHORT")
                     .short('s')

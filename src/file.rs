@@ -8,12 +8,13 @@ use std::io::SeekFrom;
 use std::io::Write;
 
 use crate::logging::deleted;
-use crate::logging::{added, header, text};
+use crate::logging::added;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct WikioFile {
     pub file: String,
     pub content: String,
+    pub file_name: String,
 }
 
 pub fn read_from_file(file_path: &String) -> Result<String> {
@@ -51,7 +52,7 @@ pub fn delete_all_dirs(dir: String) -> Result<()> {
     Ok(())
 }
 
-pub fn read_all_files_in_dir(dir: String, detailed: bool) -> Result<Vec<WikioFile>> {
+pub fn read_all_files_in_dir(dir: String) -> Result<Vec<WikioFile>> {
     let paths = fs::read_dir(dir)?;
 
     let mut files: Vec<WikioFile> = vec![];
@@ -65,12 +66,10 @@ pub fn read_all_files_in_dir(dir: String, detailed: bool) -> Result<Vec<WikioFil
         files.push(WikioFile {
             file: path_i.clone(),
             content: content.clone(),
+            file_name: file_i.clone(),
         });
 
-        header("File:".to_string(), file_i);
-        if detailed {
-            text(content);
-        }
+
     }
 
     return Ok(files);

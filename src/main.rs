@@ -33,6 +33,11 @@ fn main() -> Result<()> {
             action::add(content, &file_name, &notes_dir, file_format)?;
             Ok(())
         }
+        Some(("show", sub_matches)) => {
+            let file_name = sub_matches.get_one::<String>("FILE").expect("required");
+            action::show(file_name, &notes_dir)?;
+            Ok(())
+        }
         Some(("list", sub_matches)) => {
             let is_short: bool = match sub_matches.get_one::<String>("SHORT") {
                 Some(_) => true,

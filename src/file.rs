@@ -7,8 +7,8 @@ use std::io::Seek;
 use std::io::SeekFrom;
 use std::io::Write;
 
-use crate::logging::deleted;
 use crate::logging::added;
+use crate::logging::deleted;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct WikioFile {
@@ -68,8 +68,6 @@ pub fn read_all_files_in_dir(dir: String) -> Result<Vec<WikioFile>> {
             content: content.clone(),
             file_name: file_i.clone(),
         });
-
-
     }
 
     return Ok(files);

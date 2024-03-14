@@ -17,10 +17,14 @@ fn main() -> Result<()> {
     let matches = cli::cli().get_matches();
 
     let wcontext: WContext = WContext {
-        config_dir: format!("{}/.config/wiki-o", home_dir().get_or_insert(PathBuf::new()).display()),
+        config_dir: format!(
+            "{}/.config/wiki-o",
+            home_dir().get_or_insert(PathBuf::new()).display()
+        ),
     };
     let config = wcontext.config()?;
     let notes_dir = wcontext.notes_abs_dir()?;
+    let metadata_dir = wcontext.metadata_abs_dir()?;
     let file_format: &String = &config.file_format;
 
     match matches.subcommand() {
@@ -31,7 +35,7 @@ fn main() -> Result<()> {
                 _ => "my_notes".to_string(),
             };
 
-            action::add(content, &file_name, &notes_dir, file_format)?;
+            action::add(content, &file_name, &notes_dir, file_format, &metadata_dir)?;
             Ok(())
         }
         Some(("show", sub_matches)) => {
@@ -49,7 +53,10 @@ fn main() -> Result<()> {
             Ok(())
         }
         Some(("search", sub_matches)) => {
-            let search_string = sub_matches.get_one::<String>("SEARCH_STRING").expect("required");
+            let search_string = sub_matches
+                .get_one::<String>("SEARCH_STRING")
+                .expect("required");
+
             action::search(search_string, &notes_dir)?;
             Ok(())
         }
@@ -63,11 +70,7 @@ fn main() -> Result<()> {
             Ok(())
         }
         Some(("config", _)) => {
-            // show_config("Current configuration: ".to_string(), config.to_string());
-            let mut src = src_engine::SearchEngine::new()?;
-            src.build_index()?;
-            src.search()?;
-
+            show_config("Current configuration: ".to_string(), config.to_string());
             Ok(())
         }
         _ => unreachable!(),

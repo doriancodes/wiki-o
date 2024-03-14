@@ -3,12 +3,16 @@ use colored::Colorize;
 pub fn header(description: String, header: String) {
     println!(
         "{}",
-        format!("{} {}\n", &description.yellow(), &header.yellow().bold())
+        format!(
+            "{} {}\n",
+            &description.bright_blue(),
+            &header.bright_blue().bold()
+        )
     )
 }
 
 pub fn text(body: String) {
-    println!("{}", format!("{}", &body.yellow()))
+    println!("{}", format!("{}", &body.bright_blue()))
 }
 
 pub fn added(content: String, file: String) {
@@ -36,6 +40,10 @@ pub fn deleted(is_file: bool, resource: String) {
 pub fn show_config(description: String, text: String) {
     println!(
         "{}",
-        format!("{} \n\n{}\n", &description.yellow().bold(), &text.yellow())
+        format!(
+            "{} \n\n{}\n",
+            &description.bright_blue().bold(),
+            &text.bright_blue()
+        )
     )
 }

@@ -1,12 +1,17 @@
 use anyhow::Result;
 
-use crate::{file::{self, WikioFile}, logging::{header, text}};
+use crate::{
+    file::{self, WikioFile},
+    logging::{header, text},
+    src_engine::{self, Engine, ReadOperation, WDocument, WriteOperation},
+};
 
 pub fn add(
     content: &String,
     file_name: &String,
     notes_dir: &String,
     file_format: &String,
+    metadara_dir: &String,
 ) -> Result<()> {
     let content_f = format!("{}\n\n", content);
 
@@ -14,18 +19,27 @@ pub fn add(
 
     file::write_to_file(file_name.clone(), file_path.clone(), content_f.clone())?;
 
+    let eng = Engine::new(metadara_dir)?;
+    let mut writer = WriteOperation { engine: eng };
+    writer.build_index(vec![WDocument {
+        title: file_name.clone(),
+        body: content.clone(),
+    }])?;
+
     Ok(())
 }
 
 pub fn show(file_name: &String, notes_dir: &String) -> Result<Vec<WikioFile>> {
     let files = file::read_all_files_in_dir(notes_dir.clone())?;
-    files.iter()
-    .filter(|f| f.file_name.contains(file_name))
-    .collect::<Vec<&WikioFile>>()
-    .iter().for_each(|f| {
+    files
+        .iter()
+        .filter(|f| f.file_name.contains(file_name))
+        .collect::<Vec<&WikioFile>>()
+        .iter()
+        .for_each(|f| {
             header("File:".to_string(), f.file_name.clone());
             text(f.content.clone());
-     });
+        });
     Ok(files)
 }
 
@@ -37,23 +51,28 @@ pub fn list(is_short: bool, notes_dir: &String) -> Result<Vec<WikioFile>> {
         if !is_short {
             text(f.content.clone());
         }
-        });
+    });
 
     Ok(files)
 }
 
-pub fn search(search_str: &String, notes_dir: &String) -> Result<()> {
+pub fn search(search_str: &String, metadara_dir: &String) -> Result<()> {
+    let eng = src_engine::Engine::new(metadara_dir)?;
 
+    let reader = ReadOperation { engine: eng };
 
-    let files = file::read_all_files_in_dir(notes_dir.clone())?;
+    reader.search(search_str)?;
 
-    Ok(files.iter().for_each(|f: &WikioFile| {
-        if f.content.contains(search_str) {
-            header("File:".to_string(), f.file_name.clone());
-            text(f.content.clone());
-        }
-    }))
+    Ok(())
 
+    // let files = file::read_all_files_in_dir(notes_dir.clone())?;
+
+    // Ok(files.iter().for_each(|f: &WikioFile| {
+    //     if f.content.contains(search_str) {
+    //         header("File:".to_string(), f.file_name.clone());
+    //         text(f.content.clone());
+    //     }
+    // }))
 }
 
 pub fn delete(notes_abs_dir: &String, file_name: &String, file_format: &String) -> Result<()> {
@@ -76,7 +95,7 @@ mod tests {
 
     use std::fs;
 
-    fn setup() -> (String, String, String, String) {
+    fn setup() -> (String, String, String, String, String) {
         let test_ctx: TestContext = TestContext {
             config_dir: "test-dir/config".to_string(),
         };
@@ -86,8 +105,15 @@ mod tests {
         let file_name = "test".to_string();
 
         let notes_dir = test_ctx.notes_abs_dir().unwrap();
+        let metadata_dir = test_ctx.metadata_abs_dir().unwrap();
 
-        (content, file_name, notes_dir, config.file_format)
+        (
+            content,
+            file_name,
+            notes_dir,
+            config.file_format,
+            metadata_dir,
+        )
     }
 
     fn teardown() {
@@ -96,9 +122,16 @@ mod tests {
 
     #[test]
     fn test_add() {
-        let (content, file_name, notes_dir, file_format) = setup();
+        let (content, file_name, notes_dir, file_format, metadata_dir) = setup();
 
-        add(&content, &file_name, &notes_dir, &file_format).unwrap();
+        add(
+            &content,
+            &file_name,
+            &notes_dir,
+            &file_format,
+            &metadata_dir,
+        )
+        .unwrap();
 
         assert_eq!(
             fs::read_to_string(format!("{}/{}.{}", &notes_dir, &file_name, &file_format))
@@ -112,9 +145,16 @@ mod tests {
 
     #[test]
     fn test_list() {
-        let (content, file_name, notes_dir, file_format) = setup();
+        let (content, file_name, notes_dir, file_format, metadata_dir) = setup();
 
-        add(&content, &file_name, &notes_dir, &file_format).unwrap();
+        add(
+            &content,
+            &file_name,
+            &notes_dir,
+            &file_format,
+            &metadata_dir,
+        )
+        .unwrap();
 
         let files = list(false, &notes_dir);
 
@@ -128,9 +168,16 @@ mod tests {
 
     #[test]
     fn test_delete() {
-        let (content, file_name, notes_dir, file_format) = setup();
+        let (content, file_name, notes_dir, file_format, metadata_dir) = setup();
 
-        add(&content, &file_name, &notes_dir, &file_format).unwrap();
+        add(
+            &content,
+            &file_name,
+            &notes_dir,
+            &file_format,
+            &metadata_dir,
+        )
+        .unwrap();
         delete(&notes_dir, &file_name, &file_format).unwrap();
 
         assert!(
@@ -142,9 +189,16 @@ mod tests {
 
     #[test]
     fn test_purge() {
-        let (content, file_name, notes_dir, file_format) = setup();
+        let (content, file_name, notes_dir, file_format, metadata_dir) = setup();
 
-        add(&content, &file_name, &notes_dir, &file_format).unwrap();
+        add(
+            &content,
+            &file_name,
+            &notes_dir,
+            &file_format,
+            &metadata_dir,
+        )
+        .unwrap();
         purge(&notes_dir).unwrap();
 
         assert!(file::read_all_files_in_dir(notes_dir.clone()).is_err());

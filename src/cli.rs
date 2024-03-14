@@ -23,12 +23,11 @@ pub fn cli() -> Command {
                 .about("Show files with similar name")
                 .arg(
                     Arg::new("FILE")
-                    .short('f')
-                    .long("file")
-                    .value_name("FILE")
-                    .help("The file name"),
-                )
-
+                        .short('f')
+                        .long("file")
+                        .value_name("FILE")
+                        .help("The file name"),
+                ),
         )
         .subcommand(
             Command::new("list").about("List all notes").arg(
@@ -41,9 +40,9 @@ pub fn cli() -> Command {
         )
         .subcommand(
             Command::new("search")
-            .about("Search notes for similar content")
-            .arg(arg!(<SEARCH_STRING> "The search_string"))
-            .arg_required_else_help(true)
+                .about("Search notes for similar content")
+                .arg(arg!(<SEARCH_STRING> "The search_string"))
+                .arg_required_else_help(true),
         )
         .subcommand(
             Command::new("delete").about("Delete a note").arg(

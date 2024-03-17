@@ -12,7 +12,7 @@ use anyhow::Result;
 use home::home_dir;
 
 use crate::action::action::*;
-use crate::cli::cli::cli;
+use crate::cli::cli::{cli, pipe_command};
 use crate::io::env::{Environment, WContext};
 
 use crate::logging::logging::{show_config, text};
@@ -94,25 +94,3 @@ fn main() -> Result<()> {
     }
 }
 
-fn pipe_command() -> Result<String> {
-    let mut input = String::new();
-    loop {
-        let mut buffer = String::new();
-        if stdin().is_terminal() {
-            break;
-        }
-        match stdin().lock().read_line(&mut buffer) {
-            Ok(len) => {
-                if len == 0 {
-                    break;
-                } else {
-                    input.push_str(&buffer);
-                }
-            }
-            Err(_) => {
-                break;
-            }
-        }
-    }
-    Ok(input)
-}

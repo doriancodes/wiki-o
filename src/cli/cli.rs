@@ -1,4 +1,7 @@
+use std::io::{stdin, BufRead, IsTerminal};
+
 use clap::{arg, Arg, Command};
+use anyhow::Result;
 
 pub fn cli() -> Command {
     Command::new("wiki-o")
@@ -71,6 +74,30 @@ pub fn cli() -> Command {
                 ),
         )
         .subcommand(Command::new("config").about("Show wiki-o configuration"))
+}
+
+
+pub fn pipe_command() -> Result<String> {
+    let mut input = String::new();
+    loop {
+        let mut buffer = String::new();
+        if stdin().is_terminal() {
+            break;
+        }
+        match stdin().lock().read_line(&mut buffer) {
+            Ok(len) => {
+                if len == 0 {
+                    break;
+                } else {
+                    input.push_str(&buffer);
+                }
+            }
+            Err(_) => {
+                break;
+            }
+        }
+    }
+    Ok(input)
 }
 
 #[cfg(test)]

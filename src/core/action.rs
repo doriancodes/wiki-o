@@ -1,5 +1,6 @@
 use anyhow::Result;
 
+use crate::io::env;
 use crate::io::file;
 use crate::io::file::WikioFile;
 use crate::io::src_engine::*;
@@ -8,28 +9,41 @@ use crate::logging::logger::*;
 pub fn add(
     content: &String,
     file_name: &String,
-    notes_dir: &String,
     file_format: &String,
-    metadara_dir: &String,
-) -> Result<()> {
+    env: &env::WEnv,
+) -> Result<WikioFile> {
     let content_f = format!("{}\n\n", content);
+
+    let notes_dir = env.notes_abs_dir();
 
     let file_path = format!("{}/{}.{}", notes_dir, file_name, file_format);
 
-    file::write_to_file(file_name.clone(), file_path.clone(), content_f.clone())?;
+    println!("File path: {}", file_path);
 
-    let eng = Engine::new(metadara_dir)?;
+    let wfile = WikioFile {
+        file_name: file_name.clone(),
+        content: content_f,
+        file: file_path,
+    };
+
+    file::write_to_file(
+        wfile.file_name.clone(),
+        wfile.file.clone(),
+        wfile.content.clone(),
+    )?;
+
+    let eng = Engine::new(&env.metadata_abs_dir())?;
     let mut writer = WriteOperation { engine: eng };
     writer.build_index(vec![WDocument {
         title: file_name.clone(),
         body: content.clone(),
     }])?;
 
-    Ok(())
+    Ok(wfile)
 }
 
-pub fn show(file_name: &String, notes_dir: &str) -> Result<Vec<WikioFile>> {
-    let files = file::read_all_files_in_dir(notes_dir.to_owned())?;
+pub fn show(file_name: &String, env: &env::WEnv) -> Result<Vec<WikioFile>> {
+    let files = file::read_all_files_in_dir(env.notes_abs_dir().to_owned())?;
     files
         .iter()
         .filter(|f| f.file_name.contains(file_name))
@@ -42,8 +56,8 @@ pub fn show(file_name: &String, notes_dir: &str) -> Result<Vec<WikioFile>> {
     Ok(files)
 }
 
-pub fn list(is_short: bool, notes_dir: &str) -> Result<Vec<WikioFile>> {
-    let files = file::read_all_files_in_dir(notes_dir.to_owned())?;
+pub fn list(is_short: bool, env: &env::WEnv) -> Result<Vec<WikioFile>> {
+    let files = file::read_all_files_in_dir(env.notes_abs_dir().to_owned())?;
 
     files.iter().for_each(|f: &WikioFile| {
         header("File:".to_string(), f.file_name.clone());
@@ -55,39 +69,32 @@ pub fn list(is_short: bool, notes_dir: &str) -> Result<Vec<WikioFile>> {
     Ok(files)
 }
 
-pub fn search(search_str: &str, metadara_dir: &String) -> Result<()> {
-    let eng = Engine::new(metadara_dir)?;
+pub fn search(search_str: &str, env: &env::WEnv) -> Result<()> {
+    let eng = Engine::new(&env.metadata_abs_dir())?;
 
     let reader = ReadOperation { engine: eng };
-
-    println!("Searching for: {}", search_str);
 
     reader.search(search_str)?;
 
     Ok(())
 }
 
-pub fn delete(
-    notes_abs_dir: &String,
-    metadara_dir: &String,
-    file_name: &String,
-    file_format: &String,
-) -> Result<()> {
-    let eng = Engine::new(metadara_dir)?;
+pub fn delete(file_name: &String, file_format: &String, env: &env::WEnv) -> Result<()> {
+    let eng = Engine::new(&env.metadata_abs_dir())?;
     let mut writer = WriteOperation { engine: eng };
 
     writer.remove_document_index(file_name)?;
-    let file = format!("{}/{}.{}", notes_abs_dir, file_name, file_format);
+    let file = format!("{}/{}.{}", env.notes_abs_dir(), file_name, file_format);
 
     file::delete_file(file.clone())?;
     Ok(())
 }
 
-pub fn purge(notes_abs_dir: &str, metadara_dir: &String) -> Result<()> {
-    let eng = Engine::new(metadara_dir)?;
+pub fn purge(env: &env::WEnv) -> Result<()> {
+    let eng = Engine::new(&env.metadata_abs_dir())?;
     let mut writer = WriteOperation { engine: eng };
 
-    file::delete_all_dirs(notes_abs_dir.to_owned())?;
+    file::delete_all_dirs(env.notes_abs_dir())?;
     writer.remove_all_documents_index()?;
     //todo purge metadata
     Ok(())
@@ -97,21 +104,23 @@ pub fn purge(notes_abs_dir: &str, metadara_dir: &String) -> Result<()> {
 mod tests {
     use crate::core::action::{add, delete, list, purge};
     use crate::io;
-    use crate::io::env::{Environment, TestContext};
+    use crate::io::env::WEnv;
 
     use std::fs;
 
     fn setup() -> (String, String, String, String, String) {
-        let test_ctx: TestContext = TestContext {
-            config_dir: "test-dir/config".to_string(),
-        };
-        let config = test_ctx.config().unwrap();
+        let init_dir = io::env::ContextWriter { env: WEnv::Test };
+
+        init_dir.init().unwrap();
+
+        let env = WEnv::Test;
+        let config = env.config();
 
         let content = "test content".to_string();
         let file_name = "test".to_string();
 
-        let notes_dir = test_ctx.notes_abs_dir().unwrap();
-        let metadata_dir = test_ctx.metadata_abs_dir().unwrap();
+        let notes_dir = env.notes_abs_dir();
+        let metadata_dir = env.metadata_abs_dir();
 
         (
             content,
@@ -130,14 +139,7 @@ mod tests {
     fn test_add() {
         let (content, file_name, notes_dir, file_format, metadata_dir) = setup();
 
-        add(
-            &content,
-            &file_name,
-            &notes_dir,
-            &file_format,
-            &metadata_dir,
-        )
-        .unwrap();
+        add(&content, &file_name, &file_format, &WEnv::Test).unwrap();
 
         assert_eq!(
             fs::read_to_string(format!("{}/{}.{}", &notes_dir, &file_name, &file_format))
@@ -153,16 +155,9 @@ mod tests {
     fn test_list() {
         let (content, file_name, notes_dir, file_format, metadata_dir) = setup();
 
-        add(
-            &content,
-            &file_name,
-            &notes_dir,
-            &file_format,
-            &metadata_dir,
-        )
-        .unwrap();
+        add(&content, &file_name, &file_format, &WEnv::Test).unwrap();
 
-        let files = list(false, &notes_dir);
+        let files = list(false, &WEnv::Test);
 
         assert_eq!(
             files.unwrap()[0].file,
@@ -176,15 +171,8 @@ mod tests {
     fn test_delete() {
         let (content, file_name, notes_dir, file_format, metadata_dir) = setup();
 
-        add(
-            &content,
-            &file_name,
-            &notes_dir,
-            &file_format,
-            &metadata_dir,
-        )
-        .unwrap();
-        delete(&notes_dir, &metadata_dir, &file_name, &file_format).unwrap();
+        add(&content, &file_name, &file_format, &WEnv::Test).unwrap();
+        delete(&file_name, &file_format, &WEnv::Test).unwrap();
 
         assert!(
             fs::read_to_string(format!("{}/{}.{}", &notes_dir, &file_name, &file_format)).is_err()
@@ -197,15 +185,8 @@ mod tests {
     fn test_purge() {
         let (content, file_name, notes_dir, file_format, metadata_dir) = setup();
 
-        add(
-            &content,
-            &file_name,
-            &notes_dir,
-            &file_format,
-            &metadata_dir,
-        )
-        .unwrap();
-        purge(&notes_dir, &metadata_dir).unwrap();
+        add(&content, &file_name, &file_format, &WEnv::Test).unwrap();
+        purge(&WEnv::Test).unwrap();
 
         assert!(io::file::read_all_files_in_dir(notes_dir.clone()).is_err());
 

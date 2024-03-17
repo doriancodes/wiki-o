@@ -1,6 +1,7 @@
 use anyhow::Result;
 use serde_derive::Deserialize;
 use serde_derive::Serialize;
+use std::fmt::Display;
 use std::fs;
 use std::fs::OpenOptions;
 use std::io::Seek;
@@ -14,6 +15,16 @@ pub struct WikioFile {
     pub file: String,
     pub content: String,
     pub file_name: String,
+}
+
+impl Display for WikioFile {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "file: {}\ncontent: {}\nfile_name: {}",
+            self.file, self.content, self.file_name
+        )
+    }
 }
 
 pub fn read_from_file(file_path: &String) -> Result<String> {

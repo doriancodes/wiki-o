@@ -3,14 +3,12 @@ pub mod core;
 pub mod io;
 pub mod logging;
 
-use std::path::PathBuf;
-
 use anyhow::Result;
-use home::home_dir;
+
+use io::env::{ContextWriter, WEnv};
 
 use crate::cli::cmd::{cli, pipe_command};
 use crate::core::action::*;
-use crate::io::env::{Environment, WContext};
 
 use crate::logging::logger::{show_config, text};
 
@@ -19,15 +17,13 @@ fn main() -> Result<()> {
 
     let matches = cli().get_matches();
 
-    let wcontext: WContext = WContext {
-        config_dir: format!(
-            "{}/.config/wiki-o",
-            home_dir().get_or_insert(PathBuf::new()).display()
-        ),
-    };
-    let config = wcontext.config()?;
-    let notes_dir = wcontext.notes_abs_dir()?;
-    let metadata_dir = wcontext.metadata_abs_dir()?;
+    let current_env = WEnv::Prod;
+
+    let init_dir = ContextWriter { env: WEnv::Prod };
+
+    init_dir.init()?;
+
+    let config = current_env.config();
     let file_format: &String = &config.file_format;
 
     match matches.subcommand() {
@@ -38,18 +34,21 @@ fn main() -> Result<()> {
                 _ => "my_notes".to_string(),
             };
 
-            add(content, &file_name, &notes_dir, file_format, &metadata_dir)?;
+            // let note = WNote::from_env(content.clone(), file_name.clone(), &WEnv::Prod);
+
+            let _wfile = add(content, &file_name, file_format, &current_env)?;
+
             Ok(())
         }
         Some(("show", sub_matches)) => {
             let file_name = sub_matches.get_one::<String>("FILE").expect("required");
-            show(file_name, &notes_dir)?;
+            show(file_name, &current_env)?;
             Ok(())
         }
         Some(("list", sub_matches)) => {
             let is_short: bool = sub_matches.get_one::<String>("SHORT").is_some();
 
-            list(is_short, &notes_dir)?;
+            list(is_short, &current_env)?;
             Ok(())
         }
         Some(("search", sub_matches)) => {
@@ -57,16 +56,16 @@ fn main() -> Result<()> {
                 .get_one::<String>("SEARCH_STRING")
                 .expect("required");
 
-            search(search_string, &metadata_dir)?;
+            search(search_string, &current_env)?;
             Ok(())
         }
         Some(("delete", sub_matches)) => {
             let file_name = sub_matches.get_one::<String>("FILE").expect("required");
-            delete(&notes_dir, &metadata_dir, file_name, file_format)?;
+            delete(file_name, file_format, &current_env)?;
             Ok(())
         }
         Some(("purge", _)) => {
-            purge(&notes_dir, &metadata_dir)?;
+            purge(&current_env)?;
             Ok(())
         }
         Some(("pa", sub_matches)) => {
@@ -79,7 +78,7 @@ fn main() -> Result<()> {
                     _ => "my_notes".to_string(),
                 };
 
-                add(&content, &file_name, &notes_dir, file_format, &metadata_dir)?;
+                add(&content, &file_name, file_format, &current_env)?;
             }
             Ok(())
         }

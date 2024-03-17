@@ -1,4 +1,4 @@
-use std::{env::current_dir, fmt::Display, fs};
+use std::{env::current_dir, fmt::Display};
 
 use crate::io::file;
 
@@ -24,147 +24,130 @@ impl Display for Config {
     }
 }
 
-pub trait Environment {
-    fn config(&self) -> Result<Config>;
-    fn notes_abs_dir(&self) -> Result<String>;
-    fn metadata_abs_dir(&self) -> Result<String>;
-}
-pub struct WContext {
-    pub config_dir: String,
+pub enum WEnv {
+    Prod,
+    Test,
 }
 
-impl Environment for WContext {
-    fn config(&self) -> Result<Config> {
+impl WEnv {
+    fn config_base_dir(&self) -> String {
+        match self {
+            Self::Prod => home_dir().unwrap().display().to_string(),
+            Self::Test => current_dir().unwrap().display().to_string(),
+        }
+    }
+
+    fn wikio_base_dir(&self) -> String {
+        match self {
+            Self::Prod => home_dir().unwrap().display().to_string(),
+            Self::Test => current_dir().unwrap().display().to_string(),
+        }
+    }
+
+    fn config_dir(&self) -> String {
+        match self {
+            Self::Prod => ".config/wiki-o".to_string(),
+            Self::Test => "test-dir/config".to_string(),
+        }
+    }
+
+    pub fn config(&self) -> Config {
+        match self {
+            Self::Prod => Config {
+                notes_dir: "wiki-o/notes".to_string(),
+                metadata_dir: "wiki-o/_metadata".to_string(),
+                file_format: String::from("md"),
+            },
+            Self::Test => Config {
+                notes_dir: "test-dir/notes".to_string(),
+                metadata_dir: "test-dir/_metadata".to_string(),
+                file_format: String::from("md"),
+            },
+        }
+    }
+
+    pub fn notes_abs_dir(&self) -> String {
+        format!("{}/{}", self.wikio_base_dir(), self.config().notes_dir)
+    }
+
+    pub fn metadata_abs_dir(&self) -> String {
+        format!("{}/{}", self.wikio_base_dir(), self.config().metadata_dir)
+    }
+}
+
+pub struct ContextWriter {
+    pub env: WEnv,
+}
+
+impl ContextWriter {
+    pub fn init(&self) -> Result<()> {
+        self.create_config_dir()?;
+        self.create_dir_if_not_exist()?;
+        Ok(())
+    }
+
+    fn create_config_dir(&self) -> Result<()> {
         file::create_dir_if_not_exist(&format!(
             "{}/{}",
-            home_dir().unwrap().display(),
-            &self.config_dir
+            self.env.config_base_dir(),
+            self.env.config_dir()
         ))?;
-
-        let config = Config {
-            notes_dir: "wiki-o/notes".to_string(),
-            metadata_dir: "wiki-o/_metadata".to_string(),
-            file_format: String::from("md"),
-        };
-        let config_file = format!("{}/config.toml", &self.config_dir);
-        let _config = toml::to_string(&config)?;
-        fs::write(config_file, _config)?;
-
-        Ok(config)
+        Ok(())
     }
 
-    fn notes_abs_dir(&self) -> Result<String> {
-        self.config().and_then(|c: Config| {
-            file::create_dir_if_not_exist(&format!(
-                "{}/{}",
-                home_dir().unwrap().display(),
-                c.notes_dir
-            ))
-        })
-    }
-
-    fn metadata_abs_dir(&self) -> Result<String> {
-        self.config().and_then(|c: Config| {
-            file::create_dir_if_not_exist(&format!(
-                "{}/{}",
-                home_dir().unwrap().display(),
-                c.metadata_dir
-            ))
-        })
+    fn create_dir_if_not_exist(&self) -> Result<()> {
+        file::create_dir_if_not_exist(&self.env.notes_abs_dir())?;
+        file::create_dir_if_not_exist(&self.env.metadata_abs_dir())?;
+        Ok(())
     }
 }
 
-pub struct TestContext {
-    pub config_dir: String,
-}
+// #[cfg(test)]
+// mod tests {
+//     use std::env::current_dir;
 
-impl Environment for TestContext {
-    fn config(&self) -> Result<Config> {
-        file::create_dir_if_not_exist(&format!(
-            "{}/{}",
-            current_dir().unwrap().display(),
-            &self.config_dir
-        ))?;
+//     use crate::io::env::Config;
 
-        let config = Config {
-            notes_dir: "test-dir/notes".to_string(),
-            metadata_dir: "test-dir/_metadata".to_string(),
-            file_format: String::from("md"),
-        };
-        let config_file = format!("{}/config.toml", &self.config_dir);
-        let _config = toml::to_string(&config)?;
-        fs::write(config_file, _config)?;
+//     #[test]
+//     fn test_get_test_ctx() {
+//         let test_ctx = TestContext {
+//             config_dir: "test-dir/config".to_string(),
+//         };
 
-        Ok(config)
-    }
+//         let expected = Config {
+//             notes_dir: "test-dir/notes".to_string(),
+//             metadata_dir: "test-dir/_metadata".to_string(),
+//             file_format: "md".to_string(),
+//         };
 
-    fn notes_abs_dir(&self) -> Result<String> {
-        self.config().and_then(|c: Config| {
-            file::create_dir_if_not_exist(&format!(
-                "{}/{}",
-                current_dir().unwrap().display(),
-                c.metadata_dir
-            ))
-        })
-    }
+//         assert_eq!(test_ctx.config().unwrap().file_format, expected.file_format);
+//         assert_eq!(test_ctx.config().unwrap().notes_dir, expected.notes_dir);
 
-    fn metadata_abs_dir(&self) -> Result<String> {
-        self.config().and_then(|c: Config| {
-            file::create_dir_if_not_exist(&format!(
-                "{}/{}",
-                current_dir().unwrap().display(),
-                c.notes_dir
-            ))
-        })
-    }
-}
+//         super::file::delete_all_dirs(format!(
+//             "{}/{}",
+//             current_dir().unwrap().display(),
+//             "test-dir"
+//         ))
+//         .unwrap();
+//     }
 
-#[cfg(test)]
-mod tests {
-    use std::env::current_dir;
+//     // #[test]
+//     // fn test_get_notes_abs_dir() {
+//     //     let test_ctx = TestContext {
+//     //         config_dir: "test-dir/config".to_string(),
+//     //     };
 
-    use crate::io::env::{Config, Environment, TestContext};
+//     //     let config = test_ctx.config().unwrap();
 
-    #[test]
-    fn test_get_test_ctx() {
-        let test_ctx = TestContext {
-            config_dir: "test-dir/config".to_string(),
-        };
+//     //     let expected = format!("{}/{}", current_dir().unwrap().display(), config.notes_dir);
 
-        let expected = Config {
-            notes_dir: "test-dir/notes".to_string(),
-            metadata_dir: "test-dir/_metadata".to_string(),
-            file_format: "md".to_string(),
-        };
+//     //     assert_eq!(test_ctx.notes_abs_dir().unwrap(), expected);
 
-        assert_eq!(test_ctx.config().unwrap().file_format, expected.file_format);
-        assert_eq!(test_ctx.config().unwrap().notes_dir, expected.notes_dir);
-
-        super::file::delete_all_dirs(format!(
-            "{}/{}",
-            current_dir().unwrap().display(),
-            "test-dir"
-        ))
-        .unwrap();
-    }
-
-    // #[test]
-    // fn test_get_notes_abs_dir() {
-    //     let test_ctx = TestContext {
-    //         config_dir: "test-dir/config".to_string(),
-    //     };
-
-    //     let config = test_ctx.config().unwrap();
-
-    //     let expected = format!("{}/{}", current_dir().unwrap().display(), config.notes_dir);
-
-    //     assert_eq!(test_ctx.notes_abs_dir().unwrap(), expected);
-
-    //     super::file::delete_all_dirs(format!(
-    //         "{}/{}",
-    //         current_dir().unwrap().display(),
-    //         "test-dir".to_string()
-    //     ))
-    //     .unwrap();
-    // }
-}
+//     //     super::file::delete_all_dirs(format!(
+//     //         "{}/{}",
+//     //         current_dir().unwrap().display(),
+//     //         "test-dir".to_string()
+//     //     ))
+//     //     .unwrap();
+//     // }
+// }

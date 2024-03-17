@@ -71,8 +71,8 @@ File: <home_dir>/wiki-o/.notes/my_notes.md
 ### Delete
 
 ```console
-$ wiki-o delete -f=my_notes
-Deleted: <home_dir>/wiki-o/notes/my_notes.md
+$ wo delete -f=my_notes
+Deleted file: <home_dir>/wiki-o/notes/my_notes.md
 ```
 
 ### Purge

@@ -10,6 +10,7 @@ Smart note taking cli app
 ### Implemented commands
 
 ```console
+$ wo --help
 Create a smart wiki from command line
 
 Usage: wo [COMMAND]

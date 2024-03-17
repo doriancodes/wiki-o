@@ -38,7 +38,7 @@ pub fn show(file_name: &String, notes_dir: &str) -> Result<Vec<WikioFile>> {
         .iter()
         .for_each(|f| {
             header("File:".to_string(), f.file_name.clone());
-            text(f.content.clone());
+            text(f.content.clone().as_str());
         });
     Ok(files)
 }
@@ -49,7 +49,7 @@ pub fn list(is_short: bool, notes_dir: &str) -> Result<Vec<WikioFile>> {
     files.iter().for_each(|f: &WikioFile| {
         header("File:".to_string(), f.file_name.clone());
         if !is_short {
-            text(f.content.clone());
+            text(f.content.clone().as_str());
         }
     });
 

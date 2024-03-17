@@ -8,7 +8,7 @@ pub fn header(description: String, header: String) {
     )
 }
 
-pub fn text(body: String) {
+pub fn text(body: &str) {
     println!("{}", &body.bright_blue())
 }
 

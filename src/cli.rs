@@ -9,7 +9,7 @@ pub fn cli() -> Command {
             Command::new("add")
                 .about("Add note")
                 .arg(arg!(<NOTE> "The note to write"))
-                .arg_required_else_help(true)
+                .arg_required_else_help(false)
                 .arg(
                     Arg::new("FILE")
                         .short('f')
@@ -57,6 +57,18 @@ pub fn cli() -> Command {
         .subcommand(
             Command::new("purge")
                 .about("Purge all notes and wiki-o configuration for a clean slate"),
+        )
+        .subcommand(
+            Command::new("pa")
+                .about("Piped add note")
+                .arg_required_else_help(false)
+                .arg(
+                    Arg::new("FILE")
+                        .short('f')
+                        .long("file")
+                        .value_name("FILE")
+                        .help("The file name"),
+                ),
         )
         .subcommand(Command::new("config").about("Show wiki-o configuration"))
 }

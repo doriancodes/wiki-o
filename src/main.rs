@@ -5,15 +5,21 @@ pub mod file;
 pub mod logging;
 pub mod src_engine;
 
-use std::path::PathBuf;
+use std::{
+    io::{stdin, BufRead, IsTerminal},
+    path::PathBuf,
+};
 
 use anyhow::Result;
 use env::{Environment, WContext};
 use home::home_dir;
+use logging::text;
 
 use crate::logging::show_config;
 
 fn main() -> Result<()> {
+    let piped_commands = pipe_command()?;
+
     let matches = cli::cli().get_matches();
 
     let wcontext: WContext = WContext {
@@ -66,10 +72,47 @@ fn main() -> Result<()> {
             action::purge(&notes_dir, &metadata_dir)?;
             Ok(())
         }
+        Some(("pa", sub_matches)) => {
+            if piped_commands.is_empty() {
+                text("No piped command provided");
+            } else {
+                let content = piped_commands;
+                let file_name = match sub_matches.get_one::<String>("FILE") {
+                    Some(file_name) => file_name.clone(),
+                    _ => "my_notes".to_string(),
+                };
+
+                action::add(&content, &file_name, &notes_dir, file_format, &metadata_dir)?;
+            }
+            Ok(())
+        }
         Some(("config", _)) => {
             show_config("Current configuration: ".to_string(), config.to_string());
             Ok(())
         }
         _ => unreachable!(),
     }
+}
+
+fn pipe_command() -> Result<String> {
+    let mut input = String::new();
+    loop {
+        let mut buffer = String::new();
+        if stdin().is_terminal() {
+            break;
+        }
+        match stdin().lock().read_line(&mut buffer) {
+            Ok(len) => {
+                if len == 0 {
+                    break;
+                } else {
+                    input.push_str(&buffer);
+                }
+            }
+            Err(_) => {
+                break;
+            }
+        }
+    }
+    Ok(input)
 }

@@ -4,7 +4,7 @@ use tantivy::collector::TopDocs;
 use tantivy::directory::MmapDirectory;
 use tantivy::query::QueryParser;
 use tantivy::{doc, Index, IndexWriter, ReloadPolicy};
-use tantivy::{schema::*, IndexReader, TantivyError};
+use tantivy::{schema::*, IndexReader};
 
 use anyhow::{Ok, Result};
 

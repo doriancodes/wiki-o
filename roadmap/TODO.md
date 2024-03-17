@@ -2,7 +2,7 @@
 
 - [ ] Refactor repo structure
 - [ ] Improve test coverage
-- [ ] Allow piping commands
+- [x] Allow piping commands
 - [ ] Improve search:
   - [ ] merging indexes on existing files
   - [ ] deleting an index when a file is deleted

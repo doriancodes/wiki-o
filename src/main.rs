@@ -44,10 +44,7 @@ fn main() -> Result<()> {
             Ok(())
         }
         Some(("list", sub_matches)) => {
-            let is_short: bool = match sub_matches.get_one::<String>("SHORT") {
-                Some(_) => true,
-                _ => false,
-            };
+            let is_short: bool = sub_matches.get_one::<String>("SHORT").is_some();
 
             action::list(is_short, &notes_dir)?;
             Ok(())
@@ -62,7 +59,7 @@ fn main() -> Result<()> {
         }
         Some(("delete", sub_matches)) => {
             let file_name = sub_matches.get_one::<String>("FILE").expect("required");
-            action::delete(&notes_dir, &file_name, &file_format)?;
+            action::delete(&notes_dir, file_name, file_format)?;
             Ok(())
         }
         Some(("purge", _)) => {

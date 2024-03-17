@@ -29,8 +29,8 @@ pub fn add(
     Ok(())
 }
 
-pub fn show(file_name: &String, notes_dir: &String) -> Result<Vec<WikioFile>> {
-    let files = file::read_all_files_in_dir(notes_dir.clone())?;
+pub fn show(file_name: &String, notes_dir: &str) -> Result<Vec<WikioFile>> {
+    let files = file::read_all_files_in_dir(notes_dir.to_owned())?;
     files
         .iter()
         .filter(|f| f.file_name.contains(file_name))
@@ -43,8 +43,8 @@ pub fn show(file_name: &String, notes_dir: &String) -> Result<Vec<WikioFile>> {
     Ok(files)
 }
 
-pub fn list(is_short: bool, notes_dir: &String) -> Result<Vec<WikioFile>> {
-    let files = file::read_all_files_in_dir(notes_dir.clone())?;
+pub fn list(is_short: bool, notes_dir: &str) -> Result<Vec<WikioFile>> {
+    let files = file::read_all_files_in_dir(notes_dir.to_owned())?;
 
     files.iter().for_each(|f: &WikioFile| {
         header("File:".to_string(), f.file_name.clone());
@@ -56,7 +56,7 @@ pub fn list(is_short: bool, notes_dir: &String) -> Result<Vec<WikioFile>> {
     Ok(files)
 }
 
-pub fn search(search_str: &String, metadara_dir: &String) -> Result<()> {
+pub fn search(search_str: &str, metadara_dir: &String) -> Result<()> {
     let eng = src_engine::Engine::new(metadara_dir)?;
 
     let reader = ReadOperation { engine: eng };
@@ -64,15 +64,6 @@ pub fn search(search_str: &String, metadara_dir: &String) -> Result<()> {
     reader.search(search_str)?;
 
     Ok(())
-
-    // let files = file::read_all_files_in_dir(notes_dir.clone())?;
-
-    // Ok(files.iter().for_each(|f: &WikioFile| {
-    //     if f.content.contains(search_str) {
-    //         header("File:".to_string(), f.file_name.clone());
-    //         text(f.content.clone());
-    //     }
-    // }))
 }
 
 pub fn delete(notes_abs_dir: &String, file_name: &String, file_format: &String) -> Result<()> {
@@ -82,8 +73,8 @@ pub fn delete(notes_abs_dir: &String, file_name: &String, file_format: &String) 
     Ok(())
 }
 
-pub fn purge(notes_abs_dir: &String) -> Result<()> {
-    file::delete_all_dirs(notes_abs_dir.clone())?;
+pub fn purge(notes_abs_dir: &str) -> Result<()> {
+    file::delete_all_dirs(notes_abs_dir.to_owned())?;
     Ok(())
 }
 

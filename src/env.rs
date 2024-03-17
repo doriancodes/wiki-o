@@ -48,7 +48,7 @@ impl Environment for WContext {
         };
         let config_file = format!("{}/config.toml", &self.config_dir);
         let _config = toml::to_string(&config)?;
-        fs::write(&config_file, _config)?;
+        fs::write(config_file, _config)?;
 
         Ok(config)
     }
@@ -93,7 +93,7 @@ impl Environment for TestContext {
         };
         let config_file = format!("{}/config.toml", &self.config_dir);
         let _config = toml::to_string(&config)?;
-        fs::write(&config_file, _config)?;
+        fs::write(config_file, _config)?;
 
         Ok(config)
     }
@@ -143,7 +143,7 @@ mod tests {
         super::file::delete_all_dirs(format!(
             "{}/{}",
             current_dir().unwrap().display(),
-            "test-dir".to_string()
+            "test-dir"
         ))
         .unwrap();
     }

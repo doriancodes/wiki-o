@@ -2,28 +2,22 @@ use colored::Colorize;
 
 pub fn header(description: String, header: String) {
     println!(
-        "{}",
-        format!(
-            "{} {}\n",
-            &description.bright_blue(),
-            &header.bright_blue().bold()
-        )
+        "{} {}\n",
+        &description.bright_blue(),
+        &header.bright_blue().bold()
     )
 }
 
 pub fn text(body: String) {
-    println!("{}", format!("{}", &body.bright_blue()))
+    println!("{}", &body.bright_blue())
 }
 
 pub fn added(content: String, file: String) {
     println!(
-        "{}",
-        format!(
-            "{} {} to {}",
-            "added".green().bold(),
-            &content.green(),
-            &file.green().italic()
-        )
+        "{} {} to {}",
+        "added".green().bold(),
+        &content.green(),
+        &file.green().italic()
     )
 }
 
@@ -39,11 +33,8 @@ pub fn deleted(is_file: bool, resource: String) {
 
 pub fn show_config(description: String, text: String) {
     println!(
-        "{}",
-        format!(
-            "{} \n\n{}\n",
-            &description.bright_blue().bold(),
-            &text.bright_blue()
-        )
+        "{} \n\n{}\n",
+        &description.bright_blue().bold(),
+        &text.bright_blue()
     )
 }

@@ -105,7 +105,7 @@ RUST_TEST_THREADS=1 cargo test
 - [ ] Refactor repo structure
 - [ ] Improve test coverage
 - [ ] Allow piping commands
-- [ ] Improve search
+- [x] Improve search
 - [ ] Allow styling
 - [ ] Explore interoperability with other tools (editors like vim/emacs, logseq, ollama)
 - [ ] Remote sync via ssh

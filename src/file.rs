@@ -70,12 +70,12 @@ pub fn read_all_files_in_dir(dir: String) -> Result<Vec<WikioFile>> {
         });
     }
 
-    return Ok(files);
+    Ok(files)
 }
 
 pub fn create_dir_if_not_exist(dir: &String) -> Result<String> {
-    if fs::metadata(&dir).is_err() {
-        fs::create_dir_all(&dir)?;
+    if fs::metadata(dir).is_err() {
+        fs::create_dir_all(dir)?;
         return Ok(dir.clone());
     }
 

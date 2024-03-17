@@ -5,6 +5,10 @@ authors = ["Dorian Davì"]
 homepage = "https://github.com/doriancodes/wiki-o"
 edition = "2021"
 
+[[bin]]
+name = "wo"
+path = "src/main.rs"
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]

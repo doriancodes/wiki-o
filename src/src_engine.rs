@@ -37,7 +37,7 @@ pub struct WriteOperation {
 impl WriteOperation {
     fn set_index_writer(&mut self) -> Result<IndexWriter> {
         let index_writer = self.engine.index.writer(50_000_000)?;
-        return Ok(index_writer);
+        Ok(index_writer)
     }
 
     pub fn build_index(&mut self, documents: Vec<WDocument>) -> Result<()> {
@@ -69,7 +69,7 @@ pub struct ReadOperation {
 }
 
 impl ReadOperation {
-    pub fn search(&self, search_str: &String) -> Result<()> {
+    pub fn search(&self, search_str: &str) -> Result<()> {
         let title = Schema::get_field(&self.engine.schema, "title")?;
         let body = Schema::get_field(&self.engine.schema, "body")?;
 
@@ -84,7 +84,7 @@ impl ReadOperation {
 
         let query_parser = QueryParser::for_index(&self.engine.index, vec![title, body]);
 
-        let query = query_parser.parse_query(&search_str)?;
+        let query = query_parser.parse_query(search_str)?;
         // We can now perform our query.
         let top_docs = searcher.search(&query, &TopDocs::with_limit(10))?;
 

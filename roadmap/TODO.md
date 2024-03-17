@@ -1,6 +1,6 @@
 # TODO
 
-- [ ] Refactor repo structure
+- [x] Refactor repo structure
 - [ ] Improve test coverage
 - [x] Allow piping commands
 - [ ] Improve search:

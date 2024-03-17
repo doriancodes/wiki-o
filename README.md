@@ -10,14 +10,15 @@ Smart note taking cli app
 ### Implemented commands
 
 ```console
-$ wiki-o --help
 Create a smart wiki from command line
 
-Usage: wiki-o [COMMAND]
+Usage: wo [COMMAND]
 
 Commands:
   add     Add note
+  show    Show files with similar name
   list    List all notes
+  search  Search notes for similar content
   delete  Delete a note
   purge   Purge all notes and wiki-o configuration for a clean slate
   config  Show wiki-o configuration
@@ -30,30 +31,29 @@ Options:
 ### Show configuration
 
 ```console
-$ wiki-o init
+$ wo config
+
 Current configuration:
 
-InitialConfig {
-    notes_abs_dir: "<home_dir>/wiki-o/.notes",
-    config_abs_dir: "<home_dir>/wiki-o/.config",
-    file_format: "md",
-}
+notes directory: wiki-o/notes
+metadata directory: wiki-o/_metadata
+file format: md
 ```
 
 ### Add note
 
 ```console
-$ wiki-o add "hello world"
+$ wo add "hello world"
 Added hello world to my_notes
 
-$ wiki-o add "another note" -f=new_file
+$ wo add "another note" -f=new_file
 Added another note to new_file
 ```
 
 ### List
 
 ```console
-$ wiki-o list
+$ wo list
 File: <home_dir>/wiki-o/.notes/new_file.md
 
 another note
@@ -62,7 +62,7 @@ another note
 File: <home_dir>/wiki-o/.notes/my_notes.md
 
 hello world
-$ wiki-o list -s=true
+$ wo list -s=true
 File: <home_dir>/wiki-o/.notes/new_file.md
 File: <home_dir>/wiki-o/.notes/my_notes.md
 ```
@@ -77,19 +77,19 @@ Deleted: <home_dir>/wiki-o/notes/my_notes.md
 ### Purge
 
 ```console
-$ wiki-o purge
+$ wo purge
 Deleted directory: <home_dir>/wiki-o/notes
-Deleted <home_dir>/.config/wiki-o/config.toml
 ```
 
 ### Configuration
 
 By default the config file is located under `~/.config/wiki-o`.
 
-```tomlcurrent_dir()?.join("temp")
+```toml
 # config.toml
 notes_dir = "wiki-o/notes"
-file_format = "md"
+metadata_dir = "wiki-o/_metadata"
+file_format = "md
 ```
 
 ## Development
@@ -116,7 +116,6 @@ RUST_TEST_THREADS=1 cargo test
 - [ ] Explore analytics tools
 - [ ] Design copy/paste feature
 - [ ] Performance tuning
-
 
 ## License
 

@@ -11,8 +11,6 @@ Smart note taking cli app
 
 ```console
 $ wo --help
-Create a smart wiki from command line
-
 Usage: wo [COMMAND]
 
 Commands:
@@ -22,6 +20,7 @@ Commands:
   search  Search notes for similar content
   delete  Delete a note
   purge   Purge all notes and wiki-o configuration for a clean slate
+  pa      Piped add note
   config  Show wiki-o configuration
   help    Print this message or the help of the given subcommand(s)
 
@@ -91,6 +90,20 @@ By default the config file is located under `~/.config/wiki-o`.
 notes_dir = "wiki-o/notes"
 metadata_dir = "wiki-o/_metadata"
 file_format = "md
+```
+
+## Piping commands
+
+Instead of adding the command through the [add](#add-note), you can pipe the output that you get from another command directly into wiki-o and save it in a note:
+
+```console
+$ echo 'hello world' | wo pa
+
+added hello world to my_notes
+
+$ echo 'hello world' | wo pa -f=new_file
+
+added hello world to new_file
 ```
 
 ## Development

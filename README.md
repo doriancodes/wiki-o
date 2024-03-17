@@ -101,22 +101,9 @@ For now run all tests in the same thread:
 RUST_TEST_THREADS=1 cargo test
 ```
 
-## TODO
+## Roadmap
 
-- [ ] Refactor repo structure
-- [ ] Improve test coverage
-- [ ] Allow piping commands
-- [x] Improve search
-- [ ] Allow styling
-- [ ] Explore interoperability with other tools (editors like vim/emacs, logseq, ollama)
-- [ ] Remote sync via ssh
-- [ ] Check how to package for release
-- [ ] Check how to add docs
-- [ ] Add deamon (maybe), watch file changes
-- [ ] Explore tags
-- [ ] Explore analytics tools
-- [ ] Design copy/paste feature
-- [ ] Performance tuning
+Upcoming features/bug fixes can be found [here](/roadmap/TODO.md).
 
 ## License
 

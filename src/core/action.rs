@@ -3,7 +3,7 @@ use anyhow::Result;
 use crate::io::file;
 use crate::io::file::WikioFile;
 use crate::io::src_engine::*;
-use crate::logging::logging::*;
+use crate::logging::logger::*;
 
 pub fn add(
     content: &String,
@@ -76,7 +76,7 @@ pub fn delete(
     let eng = Engine::new(metadara_dir)?;
     let mut writer = WriteOperation { engine: eng };
 
-    writer.remove_document_index(&file_name)?;
+    writer.remove_document_index(file_name)?;
     let file = format!("{}/{}.{}", notes_abs_dir, file_name, file_format);
 
     file::delete_file(file.clone())?;
@@ -95,7 +95,7 @@ pub fn purge(notes_abs_dir: &str, metadara_dir: &String) -> Result<()> {
 
 #[cfg(test)]
 mod tests {
-    use crate::action::action::{add, delete, list, purge};
+    use crate::core::action::{add, delete, list, purge};
     use crate::io;
     use crate::io::env::{Environment, TestContext};
 

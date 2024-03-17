@@ -1,21 +1,18 @@
-pub mod action;
 pub mod cli;
+pub mod core;
 pub mod io;
 pub mod logging;
 
-use std::{
-    io::{stdin, BufRead, IsTerminal},
-    path::PathBuf,
-};
+use std::path::PathBuf;
 
 use anyhow::Result;
 use home::home_dir;
 
-use crate::action::action::*;
-use crate::cli::cli::{cli, pipe_command};
+use crate::cli::cmd::{cli, pipe_command};
+use crate::core::action::*;
 use crate::io::env::{Environment, WContext};
 
-use crate::logging::logging::{show_config, text};
+use crate::logging::logger::{show_config, text};
 
 fn main() -> Result<()> {
     let piped_commands = pipe_command()?;
@@ -93,4 +90,3 @@ fn main() -> Result<()> {
         _ => unreachable!(),
     }
 }
-

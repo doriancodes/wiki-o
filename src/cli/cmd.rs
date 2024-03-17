@@ -1,7 +1,7 @@
 use std::io::{stdin, BufRead, IsTerminal};
 
-use clap::{arg, Arg, Command};
 use anyhow::Result;
+use clap::{arg, Arg, Command};
 
 pub fn cli() -> Command {
     Command::new("wiki-o")
@@ -75,7 +75,6 @@ pub fn cli() -> Command {
         )
         .subcommand(Command::new("config").about("Show wiki-o configuration"))
 }
-
 
 pub fn pipe_command() -> Result<String> {
     let mut input = String::new();

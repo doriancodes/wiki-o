@@ -61,20 +61,36 @@ pub fn search(search_str: &str, metadara_dir: &String) -> Result<()> {
 
     let reader = ReadOperation { engine: eng };
 
+    println!("Searching for: {}", search_str);
+
     reader.search(search_str)?;
 
     Ok(())
 }
 
-pub fn delete(notes_abs_dir: &String, file_name: &String, file_format: &String) -> Result<()> {
+pub fn delete(
+    notes_abs_dir: &String,
+    metadara_dir: &String,
+    file_name: &String,
+    file_format: &String,
+) -> Result<()> {
+    let eng = src_engine::Engine::new(metadara_dir)?;
+    let mut writer = WriteOperation { engine: eng };
+
+    writer.remove_document_index(&file_name)?;
     let file = format!("{}/{}.{}", notes_abs_dir, file_name, file_format);
 
     file::delete_file(file.clone())?;
     Ok(())
 }
 
-pub fn purge(notes_abs_dir: &str) -> Result<()> {
+pub fn purge(notes_abs_dir: &str, metadara_dir: &String) -> Result<()> {
+    let eng = src_engine::Engine::new(metadara_dir)?;
+    let mut writer = WriteOperation { engine: eng };
+
     file::delete_all_dirs(notes_abs_dir.to_owned())?;
+    writer.remove_all_documents_index()?;
+    //todo purge metadata
     Ok(())
 }
 
@@ -169,7 +185,7 @@ mod tests {
             &metadata_dir,
         )
         .unwrap();
-        delete(&notes_dir, &file_name, &file_format).unwrap();
+        delete(&notes_dir, &metadata_dir, &file_name, &file_format).unwrap();
 
         assert!(
             fs::read_to_string(format!("{}/{}.{}", &notes_dir, &file_name, &file_format)).is_err()
@@ -190,7 +206,7 @@ mod tests {
             &metadata_dir,
         )
         .unwrap();
-        purge(&notes_dir).unwrap();
+        purge(&notes_dir, &metadata_dir).unwrap();
 
         assert!(file::read_all_files_in_dir(notes_dir.clone()).is_err());
 

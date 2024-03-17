@@ -54,16 +54,16 @@ fn main() -> Result<()> {
                 .get_one::<String>("SEARCH_STRING")
                 .expect("required");
 
-            action::search(search_string, &notes_dir)?;
+            action::search(search_string, &metadata_dir)?;
             Ok(())
         }
         Some(("delete", sub_matches)) => {
             let file_name = sub_matches.get_one::<String>("FILE").expect("required");
-            action::delete(&notes_dir, file_name, file_format)?;
+            action::delete(&notes_dir, &metadata_dir, file_name, file_format)?;
             Ok(())
         }
         Some(("purge", _)) => {
-            action::purge(&notes_dir)?;
+            action::purge(&notes_dir, &metadata_dir)?;
             Ok(())
         }
         Some(("config", _)) => {

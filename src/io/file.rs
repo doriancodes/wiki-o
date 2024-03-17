@@ -7,8 +7,7 @@ use std::io::Seek;
 use std::io::SeekFrom;
 use std::io::Write;
 
-use crate::logging::added;
-use crate::logging::deleted;
+use crate::logging::logging::{added, deleted};
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct WikioFile {

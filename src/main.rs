@@ -1,9 +1,7 @@
 pub mod action;
 pub mod cli;
-pub mod env;
-pub mod file;
+pub mod io;
 pub mod logging;
-pub mod src_engine;
 
 use std::{
     io::{stdin, BufRead, IsTerminal},
@@ -11,16 +9,18 @@ use std::{
 };
 
 use anyhow::Result;
-use env::{Environment, WContext};
 use home::home_dir;
-use logging::text;
 
-use crate::logging::show_config;
+use crate::action::action::*;
+use crate::cli::cli::cli;
+use crate::io::env::{Environment, WContext};
+
+use crate::logging::logging::{show_config, text};
 
 fn main() -> Result<()> {
     let piped_commands = pipe_command()?;
 
-    let matches = cli::cli().get_matches();
+    let matches = cli().get_matches();
 
     let wcontext: WContext = WContext {
         config_dir: format!(
@@ -41,18 +41,18 @@ fn main() -> Result<()> {
                 _ => "my_notes".to_string(),
             };
 
-            action::add(content, &file_name, &notes_dir, file_format, &metadata_dir)?;
+            add(content, &file_name, &notes_dir, file_format, &metadata_dir)?;
             Ok(())
         }
         Some(("show", sub_matches)) => {
             let file_name = sub_matches.get_one::<String>("FILE").expect("required");
-            action::show(file_name, &notes_dir)?;
+            show(file_name, &notes_dir)?;
             Ok(())
         }
         Some(("list", sub_matches)) => {
             let is_short: bool = sub_matches.get_one::<String>("SHORT").is_some();
 
-            action::list(is_short, &notes_dir)?;
+            list(is_short, &notes_dir)?;
             Ok(())
         }
         Some(("search", sub_matches)) => {
@@ -60,16 +60,16 @@ fn main() -> Result<()> {
                 .get_one::<String>("SEARCH_STRING")
                 .expect("required");
 
-            action::search(search_string, &metadata_dir)?;
+            search(search_string, &metadata_dir)?;
             Ok(())
         }
         Some(("delete", sub_matches)) => {
             let file_name = sub_matches.get_one::<String>("FILE").expect("required");
-            action::delete(&notes_dir, &metadata_dir, file_name, file_format)?;
+            delete(&notes_dir, &metadata_dir, file_name, file_format)?;
             Ok(())
         }
         Some(("purge", _)) => {
-            action::purge(&notes_dir, &metadata_dir)?;
+            purge(&notes_dir, &metadata_dir)?;
             Ok(())
         }
         Some(("pa", sub_matches)) => {
@@ -82,7 +82,7 @@ fn main() -> Result<()> {
                     _ => "my_notes".to_string(),
                 };
 
-                action::add(&content, &file_name, &notes_dir, file_format, &metadata_dir)?;
+                add(&content, &file_name, &notes_dir, file_format, &metadata_dir)?;
             }
             Ok(())
         }

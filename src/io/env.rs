@@ -1,6 +1,6 @@
 use std::{env::current_dir, fmt::Display, fs};
 
-use crate::file;
+use crate::io::file;
 
 use anyhow::Result;
 use home::home_dir;
@@ -123,7 +123,7 @@ impl Environment for TestContext {
 mod tests {
     use std::env::current_dir;
 
-    use crate::env::{Config, Environment, TestContext};
+    use crate::io::env::{Config, Environment, TestContext};
 
     #[test]
     fn test_get_test_ctx() {

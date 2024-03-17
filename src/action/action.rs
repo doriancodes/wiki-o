@@ -1,10 +1,9 @@
 use anyhow::Result;
 
-use crate::{
-    file::{self, WikioFile},
-    logging::{header, text},
-    src_engine::{self, Engine, ReadOperation, WDocument, WriteOperation},
-};
+use crate::io::file;
+use crate::io::file::WikioFile;
+use crate::io::src_engine::*;
+use crate::logging::logging::*;
 
 pub fn add(
     content: &String,
@@ -57,7 +56,7 @@ pub fn list(is_short: bool, notes_dir: &str) -> Result<Vec<WikioFile>> {
 }
 
 pub fn search(search_str: &str, metadara_dir: &String) -> Result<()> {
-    let eng = src_engine::Engine::new(metadara_dir)?;
+    let eng = Engine::new(metadara_dir)?;
 
     let reader = ReadOperation { engine: eng };
 
@@ -74,7 +73,7 @@ pub fn delete(
     file_name: &String,
     file_format: &String,
 ) -> Result<()> {
-    let eng = src_engine::Engine::new(metadara_dir)?;
+    let eng = Engine::new(metadara_dir)?;
     let mut writer = WriteOperation { engine: eng };
 
     writer.remove_document_index(&file_name)?;
@@ -85,7 +84,7 @@ pub fn delete(
 }
 
 pub fn purge(notes_abs_dir: &str, metadara_dir: &String) -> Result<()> {
-    let eng = src_engine::Engine::new(metadara_dir)?;
+    let eng = Engine::new(metadara_dir)?;
     let mut writer = WriteOperation { engine: eng };
 
     file::delete_all_dirs(notes_abs_dir.to_owned())?;
@@ -96,9 +95,9 @@ pub fn purge(notes_abs_dir: &str, metadara_dir: &String) -> Result<()> {
 
 #[cfg(test)]
 mod tests {
-    use crate::action::{add, delete, list, purge};
-    use crate::env::{Environment, TestContext};
-    use crate::file;
+    use crate::action::action::{add, delete, list, purge};
+    use crate::io;
+    use crate::io::env::{Environment, TestContext};
 
     use std::fs;
 
@@ -208,7 +207,7 @@ mod tests {
         .unwrap();
         purge(&notes_dir, &metadata_dir).unwrap();
 
-        assert!(file::read_all_files_in_dir(notes_dir.clone()).is_err());
+        assert!(io::file::read_all_files_in_dir(notes_dir.clone()).is_err());
 
         teardown();
     }

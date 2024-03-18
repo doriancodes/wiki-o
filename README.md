@@ -106,6 +106,18 @@ $ echo 'hello world' | wo pa -f=new_file
 added hello world to new_file
 ```
 
+And naturally you can pipe the output from wiki-o commands:
+
+```console
+$ wo show -f=new_file > new_file.txt
+$ cat new_file.txt
+File: new_file.md
+
+hello world
+
+
+```
+
 ## Development
 
 For now run all tests in the same thread:

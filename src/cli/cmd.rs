@@ -1,8 +1,7 @@
 use std::io::{stdin, BufRead, IsTerminal};
 
 use anyhow::Result;
-use clap::{arg};
-use clap::{Parser, Subcommand};
+use clap::{arg, Parser, Subcommand};
 
 #[derive(Parser)]
 #[command(name = "wiki-o", author, version, about, arg_required_else_help = true)]

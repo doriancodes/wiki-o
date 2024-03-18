@@ -1,19 +1,37 @@
 # TODO
 
 - [x] Refactor repo structure
-- [ ] Improve test coverage
+- [ ] Refactoring: file format only in config, otherwise merged with filename (given by user with filename)
+- [ ] Testing
+  - [ ] Improve coverage (~70/80%), add github badge
+  - [ ] Test with `tempdir`, not real directories
+  - [ ] Run test in parallel
+  - [ ] Test optional file names and file format all cases
 - [x] Allow piping commands
 - [ ] Improve search:
   - [ ] merging indexes on existing files
   - [ ] deleting an index when a file is deleted
   - [ ] Inject search engine in actions
-- [ ] Allow styling
-- [ ] Explore interoperability with other tools (editors like vim/emacs, logseq, ollama)
-- [ ] Remote sync via ssh
-- [ ] Check how to package for release
-- [ ] Check how to add docs
-- [ ] Add deamon (maybe), watch file changes
-- [ ] Explore tags
-- [ ] Explore analytics tools
-- [ ] Design copy/paste feature
-- [ ] Performance tuning
+- [ ] Logging
+  - [ ] Generic log functions
+  - [ ] replace `println!` with `write!` (better performance)
+  - [ ] Allow styling in config
+  - [ ] Separate styling configuration from execution
+- [ ] Prepare for release
+  - [ ] Generate `CHANGELOG.md`
+  - [ ] Check how to package for release
+  - [ ] Check how to add docs
+- [ ] Add features
+  - [ ] Remote sync via ssh
+  - [ ] Add deamon (maybe), watch file changes
+  - [ ] Design copy/paste feature
+- [ ] Improve project repo
+  - [ ] add dependabot or renovate for automatic dependency updates
+  - [ ] add trivy for security checks
+  - [ ] add linting and code smells detection in workflow
+- [ ] Misc
+  - [ ] Explore clipboard capabilities
+  - [ ] Explore tags
+  - [ ] Explore interoperability with other tools (editors like vim/emacs, logseq, ollama)
+  - [ ] Explore analytics tools
+  - [ ] Performance tuning

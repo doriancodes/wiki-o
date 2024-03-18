@@ -137,7 +137,7 @@ mod tests {
 
     #[test]
     fn test_add() {
-        let (content, file_name, notes_dir, file_format, metadata_dir) = setup();
+        let (content, file_name, notes_dir, file_format, _) = setup();
 
         add(&content, &file_name, &file_format, &WEnv::Test).unwrap();
 
@@ -153,7 +153,7 @@ mod tests {
 
     #[test]
     fn test_list() {
-        let (content, file_name, notes_dir, file_format, metadata_dir) = setup();
+        let (content, file_name, notes_dir, file_format, _) = setup();
 
         add(&content, &file_name, &file_format, &WEnv::Test).unwrap();
 
@@ -169,7 +169,7 @@ mod tests {
 
     #[test]
     fn test_delete() {
-        let (content, file_name, notes_dir, file_format, metadata_dir) = setup();
+        let (content, file_name, notes_dir, file_format, _) = setup();
 
         add(&content, &file_name, &file_format, &WEnv::Test).unwrap();
         delete(&file_name, &file_format, &WEnv::Test).unwrap();
@@ -183,7 +183,7 @@ mod tests {
 
     #[test]
     fn test_purge() {
-        let (content, file_name, notes_dir, file_format, metadata_dir) = setup();
+        let (content, file_name, notes_dir, file_format, _) = setup();
 
         add(&content, &file_name, &file_format, &WEnv::Test).unwrap();
         purge(&WEnv::Test).unwrap();

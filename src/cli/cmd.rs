@@ -27,6 +27,10 @@ pub enum Commands {
         /// file name to show
         #[arg(short, long)]
         file: String,
+
+        /// True if showing with file name
+        #[arg(short, long)]
+        complete: Option<bool>,
     },
     /// List all notes
     List {

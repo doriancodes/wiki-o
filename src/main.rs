@@ -37,8 +37,10 @@ fn main() -> Result<()> {
             add(note, &file_name, file_format, &current_env)?;
             Ok(())
         }
-        Some(Commands::Show { file }) => {
-            show(file, &current_env)?;
+        Some(Commands::Show { file, complete }) => {
+            let is_complete = complete.is_some();
+            show(file, &is_complete, &current_env)?;
+
             Ok(())
         }
         Some(Commands::List { short }) => {

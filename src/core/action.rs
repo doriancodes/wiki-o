@@ -42,7 +42,7 @@ pub fn add(
     Ok(wfile)
 }
 
-pub fn show(file_name: &String, env: &env::WEnv) -> Result<Vec<WikioFile>> {
+pub fn show(file_name: &String, is_complete: &bool, env: &env::WEnv) -> Result<Vec<WikioFile>> {
     let files = file::read_all_files_in_dir(env.notes_abs_dir().to_owned())?;
     files
         .iter()
@@ -50,8 +50,10 @@ pub fn show(file_name: &String, env: &env::WEnv) -> Result<Vec<WikioFile>> {
         .collect::<Vec<&WikioFile>>()
         .iter()
         .for_each(|f| {
-            header("File:".to_string(), f.file_name.clone());
-            text(f.content.clone().as_str());
+            if *is_complete {
+                header("File:".to_string(), f.file_name.clone());
+            }
+            text(f.content.to_owned().as_str());
         });
     Ok(files)
 }

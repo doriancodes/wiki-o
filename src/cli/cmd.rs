@@ -1,11 +1,11 @@
 use std::io::{stdin, BufRead, IsTerminal};
 
 use anyhow::Result;
-use clap::arg;
+use clap::{arg};
 use clap::{Parser, Subcommand};
 
 #[derive(Parser)]
-#[command(author, version, about, long_about = None)]
+#[command(name = "wiki-o", author, version, about, arg_required_else_help = true)]
 /// Create a smart wiki from command line
 pub struct Cli {
     #[command(subcommand)]

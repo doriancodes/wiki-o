@@ -34,7 +34,6 @@ pub fn read_from_file(file_path: &String) -> Result<String> {
 
 pub fn write_to_file(file_name: String, file_path: String, content: String) -> Result<()> {
     let mut file = OpenOptions::new()
-        .write(true)
         .read(true)
         .create(true)
         .append(true)

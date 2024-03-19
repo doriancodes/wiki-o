@@ -118,6 +118,10 @@ hello world
 
 ```
 
+## Search Engine
+
+The search engine is based on [tantivy](https://github.com/quickwit-oss/tantivy), a full text engine library inspired by [Apache Lucene](https://lucene.apache.org/). 
+
 ## Development
 
 For now run all tests in the same thread:

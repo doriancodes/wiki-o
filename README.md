@@ -118,13 +118,6 @@ hello world
 
 ```
 
-## Development
-
-For now run all tests in the same thread:
-
-```console
-RUST_TEST_THREADS=1 cargo test
-```
 
 ## Roadmap
 

@@ -48,10 +48,6 @@ fn main() -> Result<()> {
             list(is_short, &current_env)?;
             Ok(())
         }
-        Some(Commands::Search { search_string }) => {
-            search(search_string, &current_env)?;
-            Ok(())
-        }
         Some(Commands::Delete { file }) => {
             delete(file, file_format, &current_env)?;
             Ok(())

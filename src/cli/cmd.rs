@@ -38,12 +38,6 @@ pub enum Commands {
         #[arg(short, long)]
         short: Option<bool>,
     },
-    /// Search notes for similar content
-    Search {
-        /// lists test values
-        #[arg(value_name = "SEARCH_STRING")]
-        search_string: String,
-    },
     /// Delete a note
     Delete {
         /// file to delete

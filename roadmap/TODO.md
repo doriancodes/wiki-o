@@ -15,7 +15,7 @@
   - [ ] Check how to add docs
 - [ ] Improve project repo
   - [x] add renovate for automatic dependency updates
-  - [ ] add trivy for security checks
+  - [x] add trivy for security checks
   - [ ] add linting and code smells detection in workflow
 
 ## Future releases

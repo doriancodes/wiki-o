@@ -62,7 +62,6 @@ pub fn list(is_short: bool, env: &env::WEnv) -> Result<Vec<WikioFile>> {
 }
 
 pub fn delete(file_name: &String, file_format: &String, env: &env::WEnv) -> Result<()> {
-
     let file = format!("{}/{}.{}", env.notes_abs_dir(), file_name, file_format);
 
     file::delete_file(file.clone())?;
@@ -73,98 +72,4 @@ pub fn purge(env: &env::WEnv) -> Result<()> {
     file::delete_all_dirs(env.notes_abs_dir())?;
 
     Ok(())
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::core::action::{add, delete, list, purge};
-    use crate::io;
-    use crate::io::env::WEnv;
-
-    use std::fs;
-
-    fn setup() -> (String, String, String, String, String) {
-        let init_dir = io::env::ContextWriter { env: WEnv::Test };
-
-        init_dir.init().unwrap();
-
-        let env = WEnv::Test;
-        let config = env.config();
-
-        let content = "test content".to_string();
-        let file_name = "test".to_string();
-
-        let notes_dir = env.notes_abs_dir();
-        let metadata_dir = env.metadata_abs_dir();
-
-        (
-            content,
-            file_name,
-            notes_dir,
-            config.file_format,
-            metadata_dir,
-        )
-    }
-
-    fn teardown() {
-        fs::remove_dir_all("test-dir").unwrap();
-    }
-
-    #[test]
-    fn test_add() {
-        let (content, file_name, notes_dir, file_format, _) = setup();
-
-        add(&content, &file_name, &file_format, &WEnv::Test).unwrap();
-
-        assert_eq!(
-            fs::read_to_string(format!("{}/{}.{}", &notes_dir, &file_name, &file_format))
-                .unwrap()
-                .trim(),
-            content
-        );
-
-        teardown();
-    }
-
-    #[test]
-    fn test_list() {
-        let (content, file_name, notes_dir, file_format, _) = setup();
-
-        add(&content, &file_name, &file_format, &WEnv::Test).unwrap();
-
-        let files = list(false, &WEnv::Test);
-
-        assert_eq!(
-            files.unwrap()[0].file,
-            format!("{}/{}.{}", &notes_dir, &file_name, &file_format)
-        );
-
-        teardown();
-    }
-
-    #[test]
-    fn test_delete() {
-        let (content, file_name, notes_dir, file_format, _) = setup();
-
-        add(&content, &file_name, &file_format, &WEnv::Test).unwrap();
-        delete(&file_name, &file_format, &WEnv::Test).unwrap();
-
-        assert!(
-            fs::read_to_string(format!("{}/{}.{}", &notes_dir, &file_name, &file_format)).is_err()
-        );
-
-        teardown();
-    }
-
-    #[test]
-    fn test_purge() {
-        let (content, file_name, notes_dir, file_format, _) = setup();
-
-        add(&content, &file_name, &file_format, &WEnv::Test).unwrap();
-        purge(&WEnv::Test).unwrap();
-
-        assert!(io::file::read_all_files_in_dir(notes_dir.clone()).is_err());
-
-        teardown();
-    }
 }

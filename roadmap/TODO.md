@@ -10,11 +10,6 @@
   - [ ] Run test in parallel
   - [ ] Test optional file names and file format all cases
 - [x] Allow piping commands
-- [ ] Logging
-  - [ ] Generic log functions
-  - [ ] replace `println!` with `write!` (better performance)
-  - [ ] Allow styling in config
-  - [ ] Separate styling configuration from execution
 - [ ] Prepare for release
   - [ ] Generate `CHANGELOG.md`
   - [ ] Check how to package for release
@@ -40,4 +35,8 @@
   - [ ] Explore interoperability with other tools (editors like vim/emacs, logseq, ollama)
   - [ ] Explore analytics tools
   - [ ] Performance tuning
-  
+- [ ] Logging
+  - [ ] Generic log functions
+  - [ ] replace `println!` with `write!` (better performance)
+  - [ ] Allow styling in config
+  - [ ] Separate styling configuration from execution

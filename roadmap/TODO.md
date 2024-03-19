@@ -4,13 +4,14 @@
 
 - [x] Refactor repo structure
 - [ ] Refactoring: file format only in config, otherwise merged with filename (given by user with filename)
+- [ ] Improve error messages, maybe using [human-panic](https://crates.io/crates/human-panic) and mappying to specific text [`with_context`](https://rust-cli.github.io/book/tutorial/errors.html)
 - [ ] Testing
   - [ ] Improve coverage (~70/80%), add github badge
   - [x] Run test in parallel
   - [ ] Test optional file names and file format all cases
 - [x] Allow piping commands
-- [ ] Prepare for release
-  - [ ] Generate `CHANGELOG.md`
+- [x] Prepare for release
+  - [x] Generate `CHANGELOG.md`
   - [x] Check how to package for release
   - [x] Check how to add docs
 - [x] Improve project repo

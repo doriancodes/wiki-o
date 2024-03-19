@@ -1,8 +1,14 @@
 [package]
 name = "wiki-o"
 version = "0.1.0"
-authors = ["Dorian Davì"]
+license = "GNU General Public License v3.0"
+description = "Smart note taking cli app"
 homepage = "https://github.com/doriancodes/wiki-o"
+repository = "hhttps://github.com/doriancodes/wiki-o"
+keywords = ["cli", "clipboard", "notes", "wiki"]
+categories = ["command-line-utilities"]
+readme = "README.md"
+authors = ["Dorian Davì"]
 edition = "2021"
 
 [[bin]]
@@ -18,17 +24,23 @@ path = "src/lib.rs"
 
 [dependencies]
 anyhow = "1.0.81"
-chrono = "0.4.35"
 clap = { version = "4.5.3", features = ["derive"] }
 colored = "2.1.0"
 home = "0.5.9"
 serde = "1.0.197"
 serde_derive = "1.0.197"
-tempfile = "3.10.1"
-toml = "0.8.12"
 
 [dev-dependencies]
 assert_cmd = "2.0.14"
 predicates = "3.1.0"
+
+[profile.dev]
+opt-level = 1
+
+[profile.release]
+opt-level = 3
+debug = false
+debug-assertions = false
+
 
 

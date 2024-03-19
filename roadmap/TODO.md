@@ -6,8 +6,7 @@
 - [ ] Refactoring: file format only in config, otherwise merged with filename (given by user with filename)
 - [ ] Testing
   - [ ] Improve coverage (~70/80%), add github badge
-  - [ ] Test with `tempdir`, not real directories
-  - [ ] Run test in parallel
+  - [x] Run test in parallel
   - [ ] Test optional file names and file format all cases
 - [x] Allow piping commands
 - [ ] Prepare for release

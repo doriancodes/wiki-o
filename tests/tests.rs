@@ -3,11 +3,11 @@ extern crate wiki_o;
 use std::fs;
 
 use wiki_o::core::action::{add, delete, list, purge};
-use wiki_o::io;
-use wiki_o::io::env::WEnv;
+use wiki_o::io::env::{ContextWriter, WEnv};
+use wiki_o::io::file::read_all_files_in_dir;
 
 fn setup() -> (String, String, String, String, String) {
-    let init_dir = io::env::ContextWriter { env: WEnv::Test };
+    let init_dir = ContextWriter { env: WEnv::Test };
 
     init_dir.init().unwrap();
 
@@ -53,7 +53,7 @@ fn integration_test() {
     add(&content, &file_name, &file_format, &WEnv::Test).unwrap();
     purge(&WEnv::Test).unwrap();
 
-    assert!(io::file::read_all_files_in_dir(notes_dir.clone()).is_err());
+    assert!(read_all_files_in_dir(notes_dir.clone()).is_err());
 
     teardown();
 }

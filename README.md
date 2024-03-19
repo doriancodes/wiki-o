@@ -1,4 +1,6 @@
 ![test](https://github.com/doriancodes/wiki-o/actions/workflows/test.yml/badge.svg)
+![trivy](https://github.com/doriancodes/wiki-o/actions/workflows/trivy.yml/badge.svg)
+![clippy](https://github.com/doriancodes/wiki-o/actions/workflows/clippy.yml/badge.svg)
 [![License](https://img.shields.io/badge/License-GNU_General_Public_License_v3.0-green)](#license)
 
 # wiki-o
@@ -11,21 +13,23 @@ Smart note taking cli app
 
 ```console
 $ wo --help
+Smart note taking cli app
+
 Usage: wo [COMMAND]
 
 Commands:
   add     Add note
   show    Show files with similar name
   list    List all notes
-  search  Search notes for similar content
   delete  Delete a note
-  purge   Purge all notes and wiki-o configuration for a clean slate
+  purge   Purge all notes
   pa      Piped add note
   config  Show wiki-o configuration
   help    Print this message or the help of the given subcommand(s)
 
 Options:
-  -h, --help  Print help
+  -h, --help     Print help
+  -V, --version  Print version
 ```
 
 ### Show configuration

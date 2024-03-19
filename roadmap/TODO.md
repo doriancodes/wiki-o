@@ -11,8 +11,8 @@
 - [x] Allow piping commands
 - [ ] Prepare for release
   - [ ] Generate `CHANGELOG.md`
-  - [ ] Check how to package for release
-  - [ ] Check how to add docs
+  - [x] Check how to package for release
+  - [x] Check how to add docs
 - [x] Improve project repo
   - [x] add renovate for automatic dependency updates
   - [x] add trivy for security checks

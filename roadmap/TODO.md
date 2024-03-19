@@ -13,10 +13,10 @@
   - [ ] Generate `CHANGELOG.md`
   - [ ] Check how to package for release
   - [ ] Check how to add docs
-- [ ] Improve project repo
+- [x] Improve project repo
   - [x] add renovate for automatic dependency updates
   - [x] add trivy for security checks
-  - [ ] add linting and code smells detection in workflow
+  - [x] add linting and code smells detection in workflow
 
 ## Future releases
 

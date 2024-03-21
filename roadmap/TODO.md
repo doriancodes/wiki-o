@@ -3,12 +3,6 @@
 ## Next release
 
 - [x] Refactor repo structure
-- [ ] Refactoring: file format only in config, otherwise merged with filename (given by user with filename)
-- [ ] Improve error messages, maybe using [human-panic](https://crates.io/crates/human-panic) and mappying to specific text [`with_context`](https://rust-cli.github.io/book/tutorial/errors.html)
-- [ ] Testing
-  - [ ] Improve coverage (~70/80%), add github badge
-  - [x] Run test in parallel
-  - [ ] Test optional file names and file format all cases
 - [x] Allow piping commands
 - [x] Prepare for release
   - [x] Generate `CHANGELOG.md`
@@ -21,6 +15,11 @@
 
 ## Future releases
 
+- [ ] Testing
+  - [ ] Improve coverage (~70/80%), add github badge
+  - [ ] Test optional file names and file format all cases
+- [ ] Refactoring: file format only in config, otherwise merged with filename (given by user with filename)
+- [ ] Improve error messages, maybe using [human-panic](https://crates.io/crates/human-panic) and mappying to specific text [`with_context`](https://rust-cli.github.io/book/tutorial/errors.html)
 - [ ] Add features
   - [ ] Remote sync via ssh
   - [ ] Add deamon (maybe), watch file changes

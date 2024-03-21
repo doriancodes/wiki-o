@@ -11,7 +11,7 @@ pub fn add(
     file_format: &String,
     env: &env::WEnv,
 ) -> Result<WikioFile> {
-    let content_f = format!("{}\n\n", content);
+    let content_f = format!("{}\n", content);
 
     let notes_dir = env.notes_abs_dir();
 

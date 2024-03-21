@@ -7,6 +7,14 @@
 
 Smart note taking cli app
 
+This software is still in an experimental phase. The API might change with future versions.
+
+## Install
+
+```console
+$ cargo install wiki-o
+```
+
 ## Usage
 
 ### Implemented commands

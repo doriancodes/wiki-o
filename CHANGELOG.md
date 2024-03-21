@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Various features listed in [TODO](/roadmap/TODO.md)
 
-## [0.1.0] - 2024-xx-xx
+## [0.1.0] - 2024-03-21
 
 ### Added
 

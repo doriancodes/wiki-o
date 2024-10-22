@@ -27,8 +27,8 @@ anyhow = "1.0.82"
 clap = { version = "4.5.3", features = ["derive"] }
 colored = "2.1.0"
 home = "0.5.9"
-serde = "1.0.197"
-serde_derive = "1.0.197"
+serde = "1.0.200"
+serde_derive = "1.0.200"
 
 [dev-dependencies]
 assert_cmd = "2.0.14"
